@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#111315" />
+  <meta name="description" content="OMORO LAB — 『水曜日のダウソタウソ』のセリフを文字で眺め、クイズで遊び、画像カードを作る。" />
+  <title>OMORO LAB — セリフで遊ぶ</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%23111315'/%3E%3Cpath d='M11 15h42v34H11z' fill='none' stroke='%23d8ff4f' stroke-width='4'/%3E%3Cpath d='M17 38h12V25h6v13h12' fill='none' stroke='%23d8ff4f' stroke-width='5' stroke-linecap='square'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="./lab.css" />
+  <script defer src="../moments-data.js"></script>
+  <script defer src="./lab.js"></script>
+</head>
+<body class="lab-page">
+  <a class="skip-link" href="#lab-modes">遊び方を選ぶ</a>
+  <div class="page-shell">
+    <header class="site-header"><a class="brand" href="/" aria-label="OMORO トップへ"><span class="brand-symbol" aria-hidden="true"><span></span><span></span></span><span>OMORO<span class="brand-period">.</span></span></a><div class="header-right"><span class="header-edition">THE DAUSO FILE / LAB</span><a class="header-link" href="/#detail-index">全6場面へ <span aria-hidden="true">↗</span></a></div></header>
+    <main>
+      <div class="lab-intro"><div><span class="lab-kicker">OMORO / INTERACTIVE ROOM</span><h1>OMORO <em>LAB</em><span>.</span></h1></div><p>あのセリフで、ちょっと遊ぶ。<br />映像や本人の音声は使っていません。</p></div>
+      <div id="lab-modes" class="lab-modes" role="tablist" aria-label="遊び方"><button id="tab-reel" type="button" role="tab" aria-selected="true" aria-controls="reel">01 <strong>セリフ送り</strong></button><button id="tab-quiz" type="button" role="tab" aria-selected="false" aria-controls="quiz" tabindex="-1">02 <strong>誰のセリフ？</strong></button><button id="tab-card" type="button" role="tab" aria-selected="false" aria-controls="card" tabindex="-1">03 <strong>画像カード</strong></button></div>
+
+      <section id="reel" class="lab-panel" role="tabpanel" aria-labelledby="tab-reel">
+        <div class="panel-top"><span>01 / QUOTE REEL</span><span>6つのセリフを自動で送る</span></div>
+        <div class="reel-layout"><div class="reel-side"><h2>セリフを、<br />ゆっくり眺める。</h2><p>ひとつずつめくるか、速さを選んで自動で送れます。<br />気になった場面は特設ページへ。</p><label for="reel-speed">切り替えの速さ</label><select id="reel-speed"><option value="5000">ゆっくり・5秒</option><option value="3200" selected>ふつう・3.2秒</option><option value="1700">はやめ・1.7秒</option></select><div class="reel-controls"><button type="button" id="reel-prev" aria-label="前のセリフ">←</button><button type="button" id="reel-play" aria-pressed="false">▶ 自動で送る</button><button type="button" id="reel-next" aria-label="次のセリフ">→</button></div></div><div class="reel-stage" id="reel-stage" style="--reel-accent:#d8ff4f"><div class="reel-stage-top"><span>SCENE <span id="reel-number">01</span> / 06</span><span class="reel-burst" aria-hidden="true">✳</span></div><div class="reel-stage-middle" aria-live="polite" aria-atomic="true"><span id="reel-speaker">松本等しい → 宮川大好</span><p id="reel-quote">お祭り<br />男ォ！</p><small id="reel-short">唐突な歓迎</small></div><div class="reel-stage-bottom"><a id="reel-detail" href="/moments/omatsuri-otoko/">この場面を詳しく ↗</a><span id="reel-count">1 / 6</span></div></div></div><div id="reel-dots" class="reel-dots" aria-label="セリフを選ぶ"></div>
+      </section>
+
+      <section id="quiz" class="lab-panel" role="tabpanel" aria-labelledby="tab-quiz" hidden>
+        <div class="panel-top"><span>02 / SPEAKER QUIZ</span><span>6問・発言者を当てよう</span></div>
+        <div class="quiz-layout"><div class="quiz-side"><h2>これ、<br />誰のセリフ？</h2><p>6つのセリフの発言者を当てるクイズ。答えると、その場面の解説が出ます。</p><div class="quiz-score">SCORE <strong id="quiz-score">0</strong><span> / 6</span></div></div><div class="quiz-board"><div class="quiz-board-top"><span>QUESTION <span id="quiz-number">01</span> / 06</span><span id="quiz-progress">● ○ ○ ○ ○ ○</span></div><div id="quiz-question" class="quiz-question" aria-live="polite"><span>このセリフを言ったのは？</span><h3 id="quiz-quote">お祭り男ォ！</h3></div><div id="quiz-options" class="quiz-options"></div><div id="quiz-feedback" class="quiz-feedback" role="status" aria-live="polite"></div><div class="quiz-bottom"><button type="button" id="quiz-next" disabled>次の問題 →</button><button type="button" id="quiz-restart">最初から</button></div></div></div>
+      </section>
+
+      <section id="card" class="lab-panel" role="tabpanel" aria-labelledby="tab-card" hidden>
+        <div class="panel-top"><span>03 / QUOTE CARD</span><span>ブラウザ内で画像を作成</span></div>
+        <div class="card-layout"><div class="card-controls"><h2>好きなひと言を、<br />1枚に。</h2><p>セリフと色を選んで画像にできます。入力したメモも、画像内にだけ入ります。</p><label for="card-moment">セリフ</label><select id="card-moment"></select><fieldset><legend>デザイン</legend><label class="theme-option"><input type="radio" name="card-theme" value="night" checked /><span>ナイト</span></label><label class="theme-option"><input type="radio" name="card-theme" value="acid" /><span>ネオン</span></label><label class="theme-option"><input type="radio" name="card-theme" value="paper" /><span>ペーパー</span></label></fieldset><fieldset><legend>サイズ</legend><label class="theme-option"><input type="radio" name="card-size" value="square" checked /><span>正方形</span></label><label class="theme-option"><input type="radio" name="card-size" value="landscape" /><span>横長</span></label></fieldset><label for="card-note">一言メモ <small>任意・30文字まで</small></label><input id="card-note" type="text" maxlength="30" placeholder="例：この距離感が好き" /><button type="button" id="card-download">PNGを保存 ↓</button><p id="card-status" role="status" aria-live="polite"></p></div><div class="card-preview"><div class="preview-label"><span>PREVIEW / PNG</span><span id="card-dimensions">1080 × 1080</span></div><canvas id="quote-canvas" width="1080" height="1080" role="img" aria-label="選択したセリフの画像カード"></canvas><p>画像はこの端末で生成されます。番組の写真や音声は含みません。</p></div></div>
+      </section>
+    </main>
+    <footer class="lab-footer"><a class="footer-brand" href="/">OMORO<span>.</span></a><p>非公式ファンサイト。番組・出演者とは関係ありません。<br />セリフは短い抜粋と要約で紹介しています。</p><a href="/#detail-index">セリフ一覧へ ↑</a></footer>
+  </div>
+</body>
+</html>

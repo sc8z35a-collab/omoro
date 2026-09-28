@@ -1,0 +1,41 @@
+<a class="skip-link" href="#main">本文へスキップ</a>
+    <div class="scroll-progress" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
+    <div class="cursor" aria-hidden="true"><span class="cursor-label"></span></div>
+    <div class="cursor-dot" aria-hidden="true"></div>
+    <div class="curtain" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><span class="curtain-word">面白いねえ。</span></div>
+    <header class="site-header">
+      <a class="brand" href="{{base}}" aria-label="OMORO トップへ" data-cursor="HOME"><span class="brand-mark" aria-hidden="true"><i></i><i></i></span><span>OMORO<b>.</b></span></a>
+      <nav class="header-nav" aria-label="メイン">
+        <a href="{{base}}" data-nav="home">Home</a>
+        <a href="{{base}}gallery/" data-nav="gallery">3D Gallery</a>
+        <a href="{{base}}lab/" data-nav="lab">Lab</a>
+        <button type="button" class="header-btn" data-palette-open aria-label="セリフを検索 (Ctrl+K)"><span aria-hidden="true">⌕</span> Search <kbd>⌘K</kbd></button>
+        <button type="button" class="menu-toggle" aria-expanded="false" aria-controls="menu" aria-label="メニューを開く"><span></span></button>
+      </nav>
+    </header>
+    <div class="menu" id="menu" aria-hidden="true">
+      <nav class="menu-links" aria-label="全ページ">
+        <a href="{{base}}" data-preview="stage-beams"><small>00</small>ホーム</a>
+        <a href="{{base}}gallery/" data-preview="stage-blue"><small>3D</small>ギャラリー</a>
+        <a href="{{base}}lab/" data-preview="confetti"><small>LAB</small>ラボ</a>
+        <a href="{{base}}moments/omatsuri-otoko/" data-preview="m01-lanterns"><small>01</small>お祭り男ォ！</a>
+        <a href="{{base}}moments/yokatta-kono-kyori/" data-preview="m05-measure"><small>05</small>良かったこの距離でぇ</a>
+      </nav>
+      <div class="menu-preview" aria-hidden="true">
+        <img src="{{base}}img/stage-beams-sm.webp" alt="" data-key="stage-beams" class="is-on" />
+        <img src="{{base}}img/stage-blue-sm.webp" alt="" data-key="stage-blue" />
+        <img src="{{base}}img/confetti-sm.webp" alt="" data-key="confetti" />
+        <img src="{{base}}img/m01-lanterns-sm.webp" alt="" data-key="m01-lanterns" />
+        <img src="{{base}}img/m05-measure-sm.webp" alt="" data-key="m05-measure" />
+      </div>
+      <div class="menu-foot mono"><span>OMORO / NON-OFFICIAL</span><span>Press ? for shortcuts</span></div>
+    </div>
+    <div class="palette" role="dialog" aria-modal="true" aria-label="セリフ検索" hidden>
+      <div class="palette-box">
+        <div class="palette-input"><span aria-hidden="true">⌕</span><input type="text" placeholder="セリフ・発言者・タグで検索…" aria-label="検索語" autocomplete="off" /><kbd class="mono">ESC</kbd></div>
+        <ul class="palette-list" role="listbox" aria-label="検索結果"></ul>
+        <div class="palette-foot mono"><span>↑↓ 選択</span><span>↵ 開く</span><span>ESC 閉じる</span></div>
+      </div>
+    </div>
+    <div class="toast-wrap" role="status" aria-live="polite"></div>

@@ -1,1 +1,6 @@
+.raw/
+node_modules/
+.build/
+site/moments/
 .openai/
+*.log

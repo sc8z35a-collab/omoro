@@ -1,0 +1,1 @@
+{ "name": "OMORO — あの間をもう一度", "short_name": "OMORO", "start_url": "./", "display": "standalone", "background_color": "#0b0c0d", "theme_color": "#0b0c0d", "icons": [{ "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml" }] }

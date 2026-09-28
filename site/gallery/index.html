@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ja" class="no-js">
+  <head>
+    <!--#include head -->
+    <title>3D Gallery | OMORO</title>
+    <meta name="description" content="OMORO 3D Gallery — 6つのセリフが浮かぶ暗いホールを、ドラッグとスクロールで歩き回る。" />
+    <meta property="og:title" content="3D Gallery | OMORO" />
+    <script type="module" src="/src/js/pages/gallery.js"></script>
+  </head>
+  <body class="page-gallery">
+    <!--#include chrome -->
+    <main id="main" class="g-main">
+      <h1 class="sr-only">OMORO 3D ギャラリー</h1>
+      <canvas class="g-canvas" aria-label="6枚のセリフカードが浮かぶ3D空間。ドラッグで回転、クリックで拡大。" role="img" data-cursor="DRAG"></canvas>
+      <div class="g-fallback" hidden>
+        <p>この端末では3D表示ができません。代わりに一覧をどうぞ。</p>
+      </div>
+
+      <div class="g-hud g-hud-top">
+        <div class="g-title"><span class="eyebrow">3D GALLERY / 06 CARDS</span><strong class="display">浮かぶ6枚を、<br />歩いて見る。</strong></div>
+        <div class="g-layouts" role="group" aria-label="レイアウト">
+          <button type="button" data-layout="ring" aria-pressed="true">◯ Ring</button>
+          <button type="button" data-layout="helix" aria-pressed="false">∿ Helix</button>
+          <button type="button" data-layout="wall" aria-pressed="false">▦ Wall</button>
+        </div>
+      </div>
+
+      <div class="g-info" aria-live="polite">
+        <span class="mono g-info-num">— / 06</span>
+        <p class="g-info-quote display">カードを選んでください</p>
+        <span class="g-info-speaker"></span>
+        <p class="g-info-context"></p>
+        <div class="g-info-actions" hidden>
+          <a class="btn btn-primary g-open" href="#">特設ページ <span class="btn-arrow">↗</span></a>
+          <button type="button" class="btn btn-ghost g-close">閉じる</button>
+        </div>
+      </div>
+
+      <div class="g-hud g-hud-bottom">
+        <div class="g-dots" role="group" aria-label="カードを選ぶ"></div>
+        <div class="g-help mono"><span>DRAG 回転</span><span>WHEEL 移動</span><span>CLICK 拡大</span><span>← → 送る</span></div>
+        <div class="g-nav"><button type="button" class="icon-btn g-prev" aria-label="前のカード">←</button><button type="button" class="icon-btn g-next" aria-label="次のカード">→</button></div>
+      </div>
+
+      <noscript><p style="padding:120px 24px">3D表示にはJavaScriptが必要です。</p></noscript>
+      <ul class="sr-only g-list"></ul>
+    </main>
+  </body>
+</html>

@@ -1,62 +1,128 @@
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+// Generates site/moments/<slug>/index.html from data/moments.json (Vite then builds them).
+import { readFileSync, writeFileSync, mkdirSync, rmSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const moments = JSON.parse(readFileSync(resolve(root, "data/moments.json"), "utf8"));
-const dist = resolve(root, "dist");
-const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
-const lineBreaks = (lines) => lines.map(escapeHtml).join("<br />");
-const route = (moment) => `/moments/${moment.slug}/`;
-const favicon = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%23111315'/%3E%3Cpath d='M11 15h42v34H11z' fill='none' stroke='%23d8ff4f' stroke-width='4'/%3E%3Cpath d='M17 38h12V25h6v13h12' fill='none' stroke='%23d8ff4f' stroke-width='5' stroke-linecap='square'/%3E%3C/svg%3E";
+const out = resolve(root, "site/moments");
+const esc = (v) => String(v).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+const br = (lines) => lines.map(esc).join("<br />");
+const link = (m) => `{{base}}moments/${m.slug}/`;
 
-writeFileSync(resolve(dist, "moments-data.js"), `window.OMORO_MOMENTS = ${JSON.stringify(moments)};\n`);
+rmSync(out, { recursive: true, force: true });
 
-moments.forEach((moment, index) => {
-  const previous = moments[(index - 1 + moments.length) % moments.length];
-  const next = moments[(index + 1) % moments.length];
-  const beatButtons = moment.beats.map((beat, beatIndex) => `<button type="button" class="beat-tab${beatIndex === 0 ? " is-active" : ""}" data-beat="${beatIndex}" aria-current="${beatIndex === 0 ? "step" : "false"}"><span>0${beatIndex + 1}</span>${escapeHtml(beat.label)}</button>`).join("");
-  const insights = moment.insights.map((item, insightIndex) => `<article class="detail-insight"><span class="insight-number">0${insightIndex + 1} / ${escapeHtml(item.label)}</span><h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.body)}</p></article>`).join("");
-  const sequence = moments.map((item) => `<a class="sequence-item${item.slug === moment.slug ? " is-current" : ""}" href="${route(item)}" ${item.slug === moment.slug ? 'aria-current="page"' : ""}><span>${item.number}</span><strong>${escapeHtml(item.title)}</strong></a>`).join("");
+moments.forEach((m, i) => {
+  const prev = moments[(i - 1 + moments.length) % moments.length];
+  const next = moments[(i + 1) % moments.length];
+  const long = m.lines.join("").length > 10;
+  const beats = m.beats.map((b, k) => `
+          <article class="beat" data-beat="${k}">
+            <span class="beat-index mono">BEAT 0${k + 1} / 03 — ${esc(b.label)}</span>
+            <h3 class="beat-title${k === 1 ? " is-key" : ""}">${esc(b.title)}</h3>
+            <p class="beat-body">${esc(b.body)}</p>
+          </article>`).join("");
+  const insights = m.insights.map((it, k) => `
+          <article class="insight" data-reveal data-delay="${k * 0.1}" data-tilt>
+            <span class="mono">0${k + 1} / ${esc(it.label)}</span>
+            <div class="insight-glyph" aria-hidden="true">${k ? "↘" : "↗"}</div>
+            <h3>${esc(it.title)}</h3>
+            <p>${esc(it.body)}</p>
+          </article>`).join("");
+  const others = moments.map((o) => `<a class="seq${o.slug === m.slug ? " is-current" : ""}" href="${link(o)}" style="--c:${o.accent}"${o.slug === m.slug ? ' aria-current="page"' : ""}><img src="{{base}}img/${o.image}-sm.webp" alt="" loading="lazy" /><span class="mono">${o.number}</span><strong>${esc(o.title)}</strong></a>`).join("");
   const html = `<!doctype html>
-<html lang="ja">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#111315" />
-  <meta name="description" content="OMOROの名場面 ${escapeHtml(moment.number)}。${escapeHtml(moment.title)} — ${escapeHtml(moment.lead)}" />
-  <title>${escapeHtml(moment.title)} | OMORO</title>
-  <link rel="icon" type="image/svg+xml" href="${favicon}" />
-  <link rel="stylesheet" href="../../styles.css" />
-  <link rel="stylesheet" href="../../detail.css" />
-  <script defer src="../../moments-data.js"></script>
-  <script defer src="../../detail.js"></script>
-</head>
-<body class="detail-page" data-slug="${escapeHtml(moment.slug)}" style="--scene-accent: ${escapeHtml(moment.accent)}">
-  <a class="skip-link" href="#story">本文へ</a>
-  <div class="page-shell">
-    <header class="site-header detail-header"><a class="brand" href="/" aria-label="OMORO トップへ"><span class="brand-symbol" aria-hidden="true"><span></span><span></span></span><span>OMORO<span class="brand-period">.</span></span></a><div class="header-right"><span class="header-edition">THE DAUSO FILE / ${escapeHtml(moment.number)}</span><a class="header-link" href="/lab/">OMORO LAB <span aria-hidden="true">↗</span></a></div></header>
-    <main>
-      <section class="detail-hero" aria-labelledby="detail-title">
-        <div class="detail-crumb"><a href="/">OMORO</a><span>/</span><a href="/#moments">MOMENTS</a><span>/</span><strong>${escapeHtml(moment.number)}</strong></div>
-        <div class="detail-hero-grid"><div class="detail-hero-main"><div class="detail-eyebrow"><span class="detail-dot"></span> MOMENT ${escapeHtml(moment.number)} / 06 <span class="detail-divider">—</span> ${escapeHtml(moment.speaker)}</div><h1 id="detail-title" class="detail-quote${index === 5 ? " detail-quote-long" : ""}">${lineBreaks(moment.lines)}</h1><p class="detail-lead">${escapeHtml(moment.lead)}</p><div class="detail-actions"><a class="primary-action" href="#story">前後を追う <span aria-hidden="true">↓</span></a><button type="button" class="detail-button save-button" aria-pressed="false">☆ あとで見る</button><button type="button" class="detail-button copy-button">↗ リンクをコピー</button><a class="detail-button" href="/lab/?moment=${escapeHtml(moment.slug)}#card">カードにする ↗</a></div><p class="action-feedback" role="status" aria-live="polite"></p></div><div class="detail-hero-aside"><span class="aside-word">OMORO / ${escapeHtml(moment.number)}</span><div class="aside-number" aria-hidden="true">${escapeHtml(moment.number)}</div><p><span>この場面</span>${escapeHtml(moment.context)}</p></div></div>
-        <div class="detail-hero-bottom"><span>文字と解説でたどる、あの一瞬。</span><span>SCROLL ↓</span></div>
+<html lang="ja" class="no-js">
+  <head>
+    <!--#include head -->
+    <title>${esc(m.title)} | OMORO</title>
+    <meta name="description" content="OMOROの名場面 ${m.number}。${esc(m.title)} — ${esc(m.lead)}" />
+    <meta property="og:title" content="${esc(m.title)} | OMORO" />
+    <meta property="og:description" content="${esc(m.lead)}" />
+    <script type="module" src="/src/js/pages/detail.js"></script>
+  </head>
+  <body class="page-detail" data-slug="${m.slug}" style="--accent:${m.accent}">
+    <!--#include chrome -->
+    <main id="main">
+      <section class="d-hero" aria-labelledby="d-title">
+        <canvas class="d-canvas" aria-hidden="true" data-cursor="RIPPLE"></canvas>
+        <img class="d-hero-img" src="{{base}}img/${m.image}.webp" alt="" fetchpriority="high" />
+        <div class="d-hero-shade" aria-hidden="true"></div>
+        <div class="d-hero-ui">
+          <nav class="d-crumb mono" aria-label="パンくず"><a href="{{base}}">OMORO</a><span>/</span><a href="{{base}}#archive">MOMENTS</a><span>/</span><strong>${m.number}</strong></nav>
+          <div class="d-ghost latin" aria-hidden="true">${m.number}</div>
+          <div class="d-hero-main">
+            <span class="eyebrow">MOMENT ${m.number} / 06 — ${esc(m.speaker)}</span>
+            <h1 id="d-title" class="d-quote${long ? " is-long" : ""}" data-hero-quote>${br(m.lines)}</h1>
+            <p class="d-en latin" aria-hidden="true">“${esc(m.en)}”</p>
+            <p class="d-lead">${esc(m.lead)}</p>
+            <div class="d-actions">
+              <a class="btn btn-primary" href="#story">前後を追う <span class="btn-arrow">↓</span></a>
+              <button type="button" class="btn btn-ghost d-save" aria-pressed="false">☆ あとで見る</button>
+              <button type="button" class="btn btn-ghost d-share">↗ シェア</button>
+              <a class="btn btn-ghost" href="{{base}}lab/?moment=${m.slug}#card">カードにする <span class="btn-arrow">↗</span></a>
+            </div>
+          </div>
+          <aside class="d-aside">
+            <span class="mono">この場面</span>
+            <p>${esc(m.context)}</p>
+            <div class="d-meters">
+              <div><span class="mono">VOLUME</span><i style="--v:${m.volume}%"></i><b class="mono">${m.volume}</b></div>
+              <div><span class="mono">MA / 間</span><i style="--v:${Math.min(100, Math.round(m.gap / 3 * 100))}%"></i><b class="mono">${m.gap}s</b></div>
+            </div>
+            <div class="d-tags">${m.tags.map((t) => `<span>#${esc(t)}</span>`).join("")}</div>
+          </aside>
+        </div>
       </section>
 
-      <section class="beat-section" id="story" aria-labelledby="beat-heading"><div class="detail-section-top"><span>01 / THE BEATS</span><span>3つの場面</span></div><div class="beat-heading"><h2 id="beat-heading">この一言の、<br />前と後。</h2><p>順にタップして、流れを追えます。</p></div><div class="beat-layout"><div class="beat-tabs" role="group" aria-label="場面を選択">${beatButtons}</div><div class="beat-screen" aria-live="polite" aria-atomic="true"><span class="beat-screen-label">BEAT <span id="beat-counter">01</span> / 03</span><div class="beat-screen-content"><span id="beat-role">${escapeHtml(moment.beats[0].label)}</span><h3 id="beat-title">${escapeHtml(moment.beats[0].title)}</h3><p id="beat-body">${escapeHtml(moment.beats[0].body)}</p></div><div class="beat-screen-footer"><button class="beat-autoplay" type="button" aria-pressed="false">▶ 文字で順に見る</button><span>映像・音声はありません</span></div></div></div></section>
+      <div class="marquee" data-speed="50" aria-hidden="true"><div class="marquee-track">${Array.from({ length: 4 }, () => `<span class="marquee-item">${esc(m.title)}<i>✳</i></span><span class="marquee-item is-outline">${esc(m.en)}<i>✳</i></span>`).join("")}</div></div>
 
-      <section class="detail-analysis" aria-labelledby="analysis-heading"><div class="detail-section-top"><span>02 / THE POINT</span><span>OMORO NOTES</span></div><div class="analysis-heading"><span class="analysis-spark" aria-hidden="true">✳</span><h2 id="analysis-heading">ここが、<br />おもろい。</h2></div><div class="insight-grid">${insights}</div></section>
+      <section class="d-beats" id="story" aria-labelledby="beats-heading">
+        <div class="d-beats-pin">
+          <div class="d-beats-side">
+            <span class="eyebrow">01 / THE BEATS</span>
+            <h2 id="beats-heading" class="section-title">この一言の、<br />前と後。</h2>
+            <div class="d-beat-dots" aria-hidden="true"><i class="is-on"></i><i></i><i></i></div>
+            <p class="mono d-beat-note">スクロールで流れを追えます。映像・音声はありません。</p>
+          </div>
+          <div class="d-beats-list">${beats}
+          </div>
+        </div>
+      </section>
 
-      <section class="sequence-section" aria-labelledby="sequence-heading"><div class="detail-section-top"><span>03 / THE FULL SET</span><span>6 SCENES</span></div><h2 id="sequence-heading">他のセリフも追う。</h2><div class="sequence-grid">${sequence}</div><div class="detail-neighbors"><a href="${route(previous)}"><span>← 前のセリフ</span><strong>${escapeHtml(previous.title)}</strong></a><a href="${route(next)}"><span>次のセリフ →</span><strong>${escapeHtml(next.title)}</strong></a></div></section>
+      <section class="section d-insights" aria-labelledby="point-heading">
+        <div class="section-top"><span>02 / THE POINT</span><span>OMORO NOTES</span></div>
+        <h2 id="point-heading" class="section-title" data-split>ここが、<br />おもろい。</h2>
+        <div class="insight-grid">${insights}
+        </div>
+      </section>
+
+      <section class="section d-react" aria-labelledby="react-heading">
+        <div class="d-react-box" data-reveal>
+          <div><span class="eyebrow">03 / YOUR REACTION</span><h2 id="react-heading" class="section-title">どうだった？</h2><p class="section-lead">押した数はこの端末にだけ残ります。</p></div>
+          <div class="d-react-btns" role="group" aria-label="反応する">
+            <button type="button" data-react="lol"><span aria-hidden="true">🤣</span>笑った<b>0</b></button>
+            <button type="button" data-react="ma"><span aria-hidden="true">……</span>間が好き<b>0</b></button>
+            <button type="button" data-react="wow"><span aria-hidden="true">✳</span>天才<b>0</b></button>
+          </div>
+        </div>
+      </section>
+
+      <section class="section d-seq" aria-labelledby="seq-heading">
+        <div class="section-top"><span>04 / THE FULL SET</span><span>6 SCENES</span></div>
+        <h2 id="seq-heading" class="section-title" data-split>他のセリフも追う。</h2>
+        <div class="seq-grid">${others}</div>
+        <div class="d-neighbors">
+          <a href="${link(prev)}" style="--c:${prev.accent}" data-cursor="PREV"><img src="{{base}}img/${prev.image}-sm.webp" alt="" loading="lazy" /><span class="mono">← 前のセリフ / ${prev.number}</span><strong>${esc(prev.title)}</strong></a>
+          <a href="${link(next)}" style="--c:${next.accent}" data-cursor="NEXT"><img src="{{base}}img/${next.image}-sm.webp" alt="" loading="lazy" /><span class="mono">次のセリフ / ${next.number} →</span><strong>${esc(next.title)}</strong></a>
+        </div>
+      </section>
     </main>
-    <footer class="detail-footer"><div><a href="/" class="footer-brand">OMORO<span>.</span></a><p>非公式ファンサイト。番組・出演者とは関係ありません。<br />セリフは短い抜粋、前後は要約と解説です。映像・音声は掲載していません。</p></div><div class="detail-source"><span>ABOUT THE EPISODE</span><a href="https://www.tbs.co.jp/suiyobinodowntown/" target="_blank" rel="noopener noreferrer">番組公式サイト ↗</a><a href="https://natalie.mu/owarai/news/202469" target="_blank" rel="noopener noreferrer">2016年の放送記事 ↗</a></div></footer>
-  </div>
-</body>
+    <!--#include footer -->
+  </body>
 </html>
 `;
-  const directory = resolve(dist, "moments", moment.slug);
-  mkdirSync(directory, { recursive: true });
-  writeFileSync(resolve(directory, "index.html"), html);
+  const dir = resolve(out, m.slug);
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(resolve(dir, "index.html"), html);
 });
-
 console.log(`Built ${moments.length} OMORO detail pages.`);

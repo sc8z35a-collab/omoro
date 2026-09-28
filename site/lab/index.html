@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="ja" class="no-js">
+  <head>
+    <!--#include head -->
+    <title>OMORO LAB — セリフで遊ぶ</title>
+    <meta name="description" content="OMORO LAB — セリフ送り、発言者クイズ、画像カード、距離シミュレーター、間チャレンジ、温度差変換機。" />
+    <meta property="og:title" content="OMORO LAB — セリフで遊ぶ" />
+    <script type="module" src="/src/js/pages/lab.js"></script>
+  </head>
+  <body class="page-lab">
+    <!--#include chrome -->
+    <main id="main">
+      <section class="lab-hero" aria-labelledby="lab-title">
+        <img class="lab-hero-img" src="{{base}}img/confetti.webp" alt="" />
+        <div class="lab-hero-inner">
+          <span class="eyebrow">OMORO / INTERACTIVE ROOM</span>
+          <h1 id="lab-title" class="lab-title"><span>OMORO</span> <em>LAB</em><b>.</b></h1>
+          <p class="section-lead">あのセリフで、ちょっと遊ぶ。6つの遊び場は、すべてブラウザ内で完結します。映像や本人の音声は使っていません。</p>
+        </div>
+      </section>
+
+      <nav class="lab-tabs" role="tablist" aria-label="遊び方">
+        <button role="tab" id="tab-reel" aria-controls="reel" aria-selected="true"><span class="mono">01</span>セリフ送り</button>
+        <button role="tab" id="tab-quiz" aria-controls="quiz" aria-selected="false" tabindex="-1"><span class="mono">02</span>誰のセリフ？</button>
+        <button role="tab" id="tab-card" aria-controls="card" aria-selected="false" tabindex="-1"><span class="mono">03</span>画像カード</button>
+        <button role="tab" id="tab-distance" aria-controls="distance" aria-selected="false" tabindex="-1"><span class="mono">04</span>距離シミュ <i>NEW</i></button>
+        <button role="tab" id="tab-ma" aria-controls="ma" aria-selected="false" tabindex="-1"><span class="mono">05</span>間チャレンジ <i>NEW</i></button>
+        <button role="tab" id="tab-temp" aria-controls="temp" aria-selected="false" tabindex="-1"><span class="mono">06</span>温度差変換 <i>NEW</i></button>
+        <span class="lab-tabs-ink" aria-hidden="true"></span>
+      </nav>
+
+      <!-- 01 REEL -->
+      <section id="reel" class="lab-panel" role="tabpanel" aria-labelledby="tab-reel">
+        <div class="panel-grid">
+          <div class="panel-side">
+            <span class="eyebrow">01 / QUOTE REEL</span>
+            <h2 class="panel-title">セリフを、<br />ゆっくり眺める。</h2>
+            <p>3Dでめくれるカードを、ひとつずつ、または自動で。スワイプ・← → でも送れます。</p>
+            <label class="field"><span>切り替えの速さ</span><select id="reel-speed"><option value="5000">ゆっくり・5秒</option><option value="3200" selected>ふつう・3.2秒</option><option value="1700">はやめ・1.7秒</option></select></label>
+            <div class="row"><button type="button" class="icon-btn" id="reel-prev" aria-label="前のセリフ">←</button><button type="button" class="btn btn-primary" id="reel-play" aria-pressed="false">▶ 自動で送る</button><button type="button" class="icon-btn" id="reel-next" aria-label="次のセリフ">→</button></div>
+          </div>
+          <div class="reel-stage">
+            <div class="reel-deck" id="reel-deck" aria-live="polite"></div>
+            <div class="reel-dots" id="reel-dots" role="group" aria-label="セリフを選ぶ"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 02 QUIZ -->
+      <section id="quiz" class="lab-panel" role="tabpanel" aria-labelledby="tab-quiz" hidden>
+        <div class="panel-grid">
+          <div class="panel-side">
+            <span class="eyebrow">02 / SPEAKER QUIZ</span>
+            <h2 class="panel-title">これ、<br />誰のセリフ？</h2>
+            <p>6問。制限時間つきモードでは、早く答えるほど高得点。ベストスコアはこの端末に保存されます。</p>
+            <label class="switch"><input type="checkbox" id="quiz-timed" /><span></span>タイムアタック（1問10秒）</label>
+            <div class="quiz-score"><span class="mono">SCORE</span><strong id="quiz-score">0</strong><span class="mono">BEST <b id="quiz-best">0</b></span></div>
+          </div>
+          <div class="quiz-board">
+            <div class="quiz-top mono"><span>QUESTION <b id="quiz-number">01</b> / 06</span><span class="quiz-progress" id="quiz-progress"></span></div>
+            <div class="quiz-timer" aria-hidden="true"><i id="quiz-timer"></i></div>
+            <div class="quiz-q"><span>このセリフを言ったのは？</span><h3 id="quiz-quote" class="display">お祭り男ォ！</h3></div>
+            <div class="quiz-options" id="quiz-options"></div>
+            <div class="quiz-feedback" id="quiz-feedback" role="status" aria-live="polite"></div>
+            <div class="row"><button type="button" class="btn btn-primary" id="quiz-next" disabled>次の問題 →</button><button type="button" class="btn btn-ghost" id="quiz-restart">最初から</button></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 03 CARD -->
+      <section id="card" class="lab-panel" role="tabpanel" aria-labelledby="tab-card" hidden>
+        <div class="panel-grid">
+          <div class="panel-side">
+            <span class="eyebrow">03 / QUOTE CARD</span>
+            <h2 class="panel-title">好きなひと言を、<br />1枚に。</h2>
+            <label class="field"><span>セリフ</span><select id="card-moment"></select></label>
+            <fieldset class="chips"><legend>デザイン</legend>
+              <label><input type="radio" name="card-theme" value="photo" checked /><span>フォト</span></label>
+              <label><input type="radio" name="card-theme" value="night" /><span>ナイト</span></label>
+              <label><input type="radio" name="card-theme" value="acid" /><span>ネオン</span></label>
+              <label><input type="radio" name="card-theme" value="paper" /><span>ペーパー</span></label>
+              <label><input type="radio" name="card-theme" value="holo" /><span>ホロ</span></label>
+            </fieldset>
+            <fieldset class="chips"><legend>サイズ</legend>
+              <label><input type="radio" name="card-size" value="square" checked /><span>正方形</span></label>
+              <label><input type="radio" name="card-size" value="landscape" /><span>横長 (OGP)</span></label>
+              <label><input type="radio" name="card-size" value="story" /><span>ストーリー</span></label>
+            </fieldset>
+            <label class="field"><span>一言メモ <small>任意・30文字まで</small></span><input id="card-note" type="text" maxlength="30" placeholder="例：この距離感が好き" /></label>
+            <div class="row"><button type="button" class="btn btn-primary" id="card-download">PNGを保存 ↓</button><button type="button" class="btn btn-ghost" id="card-share">共有</button></div>
+            <p class="mono muted" id="card-status" role="status" aria-live="polite"></p>
+          </div>
+          <div class="card-preview">
+            <div class="card-preview-top mono"><span>PREVIEW / PNG</span><span id="card-dimensions">1080 × 1080</span></div>
+            <div class="card-frame" data-tilt><canvas id="quote-canvas" width="1080" height="1080" role="img" aria-label="選択したセリフの画像カード"></canvas></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 04 DISTANCE -->
+      <section id="distance" class="lab-panel" role="tabpanel" aria-labelledby="tab-distance" hidden>
+        <div class="panel-grid">
+          <div class="panel-side">
+            <span class="eyebrow">04 / DISTANCE SIMULATOR</span>
+            <h2 class="panel-title">「しばくぞ」から、<br />何m離れる？</h2>
+            <p>2人の距離をスライダーで動かすと、安心度が変わります。「良かったこの距離でぇ」と言える距離を探そう。</p>
+            <label class="field"><span>2人の距離 <b id="dist-value" class="mono">3.0 m</b></span><input type="range" id="dist-range" min="0.3" max="8" step="0.1" value="3" /></label>
+            <div class="dist-meter"><span class="mono">安心度</span><i><b id="dist-bar"></b></i><strong id="dist-pct" class="mono">60%</strong></div>
+            <button type="button" class="btn btn-primary" id="dist-shout">「しばくぞ」と言う</button>
+          </div>
+          <div class="dist-stage">
+            <canvas id="dist-canvas" aria-hidden="true"></canvas>
+            <p class="dist-verdict display" id="dist-verdict" aria-live="polite">……</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 05 MA -->
+      <section id="ma" class="lab-panel" role="tabpanel" aria-labelledby="tab-ma" hidden>
+        <div class="panel-grid">
+          <div class="panel-side">
+            <span class="eyebrow">05 / MA CHALLENGE</span>
+            <h2 class="panel-title">ちょうどいい<br />「間」で押せ。</h2>
+            <p>大声の「お祭り男ォ！」のあと、ちょうど <b class="accent" id="ma-target">1.8</b> 秒で「ｵﾏﾂﾘｵﾄｺｶ…」を返そう。ボタン・スペースキーでプレイ。</p>
+            <div class="ma-best mono">BEST <b id="ma-best">—</b></div>
+            <ol class="ma-history" id="ma-history" aria-label="直近の記録"></ol>
+          </div>
+          <div class="ma-stage">
+            <div class="ma-ring"><svg viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="88" class="ma-track" /><circle cx="100" cy="100" r="88" class="ma-target-arc" id="ma-arc" /><circle cx="100" cy="100" r="88" class="ma-progress" id="ma-progress" /></svg>
+              <div class="ma-center"><span class="mono" id="ma-state">READY</span><strong class="display" id="ma-line">お祭り男ォ！</strong><span class="mono" id="ma-time">0.00s</span></div>
+            </div>
+            <button type="button" class="btn btn-primary ma-btn" id="ma-btn">▶ スタート</button>
+            <p class="ma-result" id="ma-result" aria-live="polite"></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 06 TEMP -->
+      <section id="temp" class="lab-panel" role="tabpanel" aria-labelledby="tab-temp" hidden>
+        <div class="panel-grid">
+          <div class="panel-side">
+            <span class="eyebrow">06 / TEMPERATURE CONVERTER</span>
+            <h2 class="panel-title">どんな言葉も、<br />温度差で。</h2>
+            <p>入力した言葉を「大声」と「小声（半角カナ）」の2段で表示。ｵﾏﾂﾘｵﾄｺｶ… 方式で、同じ言葉がもう一度おかしくなる。</p>
+            <label class="field"><span>言葉を入れる</span><input type="text" id="temp-input" maxlength="16" value="お祭り男" /></label>
+            <div class="row wrap" id="temp-presets"></div>
+            <button type="button" class="btn btn-ghost" id="temp-copy">テキストをコピー</button>
+          </div>
+          <div class="temp-stage">
+            <p class="temp-loud display" id="temp-loud">お祭り男ォ！</p>
+            <div class="temp-gap mono" aria-hidden="true">— 間 —</div>
+            <p class="temp-quiet" id="temp-quiet">ｵﾏﾂﾘｵﾄｺｶ…</p>
+          </div>
+        </div>
+      </section>
+    </main>
+    <!--#include footer -->
+  </body>
+</html>

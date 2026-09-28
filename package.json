@@ -1,0 +1,25 @@
+{
+  "name": "omoro",
+  "private": true,
+  "version": "2.0.0",
+  "type": "module",
+  "scripts": {
+    "pages": "node scripts/build-pages.mjs",
+    "dev": "npm run pages && vite --host 0.0.0.0 --port 5173",
+    "build": "npm run pages && vite build",
+    "build:gh": "npm run pages && BASE=/omoro/ vite build",
+    "preview": "vite preview --host 0.0.0.0 --port 4173",
+    "publish": "npm run build:gh && node scripts/publish-root.mjs",
+    "images": "node scripts/process-images.mjs",
+    "og": "node scripts/og.mjs"
+  },
+  "dependencies": {
+    "gsap": "^3.15.0",
+    "lenis": "^1.3.26",
+    "three": "^0.186.1"
+  },
+  "devDependencies": {
+    "sharp": "^0.35.4",
+    "vite": "^8.3.1"
+  }
+}

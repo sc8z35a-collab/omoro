@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="ja" class="no-js">
+  <head>
+    <!--#include head -->
+    <title>OMORO — 水曜日のダウソタウソ、あの間をもう一度。</title>
+    <meta name="description" content="OMORO — 『水曜日のダウソタウソ』の忘れられないセリフと、その絶妙な間を3Dとアニメーションでたどる非公式ファンアーカイブ。" />
+    <meta property="og:title" content="OMORO — あの間を、もう一度。" />
+    <meta property="og:description" content="6つのセリフを、3D・クイズ・画像カードでたどる非公式ファンアーカイブ。" />
+    <script type="module" src="/src/js/pages/home.js"></script>
+  </head>
+  <body class="page-home">
+    <!--#include loader -->
+    <!--#include chrome -->
+
+    <main id="main">
+      <!-- ============ HERO ============ -->
+      <section class="hero" aria-labelledby="hero-title">
+        <canvas class="hero-canvas" aria-hidden="true" data-cursor="DRAG"></canvas>
+        <div class="hero-fallback webgl-fallback" aria-hidden="true"></div>
+        <div class="hero-vignette" aria-hidden="true"></div>
+        <div class="hero-ui">
+          <div class="hero-rail mono"><span class="hero-rail-dot"></span>INTERNET COMEDY ARCHIVE<span class="hero-rail-line"></span>2016 → 2026<span class="hero-rail-live">● LIVE 3D</span></div>
+          <h1 id="hero-title" class="hero-title">
+            <span class="split-line"><span class="hero-title-row" data-hero-row>それが、</span></span>
+            <span class="split-line"><span class="hero-title-row" data-hero-row><em>面白い</em>ねえ<b>。</b></span></span>
+          </h1>
+          <div class="hero-side">
+            <p class="hero-copy" data-hero-fade>ひと言、沈黙、もうひと言。<br />『水曜日のダウソタウソ』で生まれた<br />忘れられない<strong>“あの間”</strong>を、3Dでたどる。</p>
+            <div class="hero-actions" data-hero-fade>
+              <a class="btn btn-primary" href="#moments" data-cursor="GO">セリフを見る <span class="btn-arrow">↓</span></a>
+              <a class="btn btn-ghost" href="{{base}}gallery/">3D Gallery <span class="btn-arrow">↗</span></a>
+            </div>
+          </div>
+          <div class="hero-switch" role="group" aria-label="空中に浮かぶセリフを切り替え" data-hero-fade>
+            <span class="mono hero-switch-label">MORPH ▸</span>
+            <button type="button" class="hero-chip is-active" data-morph="intro" aria-pressed="true">✳</button>
+          </div>
+          <div class="hero-bottom mono" data-hero-fade>
+            <span>OMORO / NON-OFFICIAL FAN ARCHIVE</span>
+            <span class="hero-now" aria-live="polite">NOW: 面白いねえ。</span>
+            <span class="hero-scroll">SCROLL<i></i></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ MARQUEE ============ -->
+      <div class="marquee" data-speed="70" aria-hidden="true">
+        <div class="marquee-track">
+          <span class="marquee-item">お祭り男ォ！<i>✳</i></span><span class="marquee-item is-outline">ｵﾏﾂﾘｵﾄｺｶ…<i>✳</i></span><span class="marquee-item">兄さん、アカーン！<i>✳</i></span><span class="marquee-item is-outline">そこはアカン！<i>✳</i></span><span class="marquee-item">良かったこの距離でぇ<i>✳</i></span><span class="marquee-item is-outline">バチコーンストライク！<i>✳</i></span>
+        </div>
+      </div>
+
+      <!-- ============ STATS ============ -->
+      <section class="stats" aria-label="数字で見るOMORO">
+        <div class="stat" data-reveal><span class="stat-num"><span data-count="6">0</span></span><span class="stat-label">名セリフ</span></div>
+        <div class="stat" data-reveal data-delay=".08"><span class="stat-num"><span data-count="18">0</span></span><span class="stat-label">前後のビート</span></div>
+        <div class="stat" data-reveal data-delay=".16"><span class="stat-num"><span data-count="10">0</span><small>年</small></span><span class="stat-label">越しの再燃</span></div>
+        <div class="stat" data-reveal data-delay=".24"><span class="stat-num">∞</span><span class="stat-label">あの間</span></div>
+      </section>
+
+      <!-- ============ HORIZONTAL MOMENTS ============ -->
+      <section class="hscroll" id="moments" aria-labelledby="moments-heading">
+        <div class="hscroll-pin">
+          <div class="hscroll-head">
+            <span class="eyebrow">01 / THE MOMENTS</span>
+            <h2 id="moments-heading" class="section-title" data-split>名場面を、<br />ひとつずつ。</h2>
+            <p class="section-lead">横にスクロールして、6つのセリフを。カードにカーソルを乗せると、ホログラムのように傾きます。</p>
+            <div class="hscroll-progress mono"><span class="hscroll-current">01</span><i><b></b></i><span>06</span></div>
+          </div>
+          <div class="hscroll-track" role="list"></div>
+        </div>
+      </section>
+
+      <!-- ============ STAGE PLAYER ============ -->
+      <section class="section player" id="player" aria-labelledby="player-heading">
+        <div class="section-top"><span>02 / THE STAGE</span><span>← → キーでも切り替え</span></div>
+        <div class="player-head">
+          <h2 id="player-heading" class="section-title" data-split>ステージで、<br />もう一度。</h2>
+          <p class="section-lead" data-reveal>選ぶと、写真と前後の流れ、「面白いところ」が切り替わります。反応ボタンの数はこの端末にだけ残ります。</p>
+        </div>
+        <div class="player-layout">
+          <nav class="player-list" aria-label="名場面を選択"></nav>
+          <article class="stage" id="stage" aria-live="polite">
+            <div class="stage-media" aria-hidden="true"><img class="stage-img" alt="" /><img class="stage-img stage-img-next" alt="" /></div>
+            <div class="stage-shade" aria-hidden="true"></div>
+            <div class="stage-top mono"><span class="stage-live"><i></i> MOMENT <b class="stage-num">01</b> / 06</span><span class="stage-tags"></span></div>
+            <div class="stage-body">
+              <span class="stage-person"></span>
+              <p class="stage-quote"></p>
+              <p class="stage-context"></p>
+              <ol class="stage-beats"></ol>
+            </div>
+            <div class="stage-foot">
+              <span class="stage-point mono"></span>
+              <div class="stage-react" role="group" aria-label="反応する">
+                <button type="button" data-react="lol" aria-label="笑った">🤣 <b>0</b></button>
+                <button type="button" data-react="ma" aria-label="間が好き">…… <b>0</b></button>
+                <button type="button" data-react="wow" aria-label="すごい">✳ <b>0</b></button>
+              </div>
+              <div class="stage-actions">
+                <a class="btn btn-primary stage-detail" href="#">特設ページ <span class="btn-arrow">↗</span></a>
+                <button type="button" class="btn btn-ghost stage-save" aria-pressed="false">☆ 保存</button>
+                <button type="button" class="icon-btn stage-copy" aria-label="リンクをコピー">⧉</button>
+                <button type="button" class="icon-btn stage-prev" aria-label="前の場面">←</button>
+                <button type="button" class="icon-btn stage-next" aria-label="次の場面">→</button>
+              </div>
+            </div>
+            <div class="stage-bar" aria-hidden="true"><i></i></div>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============ CHAIN MAP ============ -->
+      <section class="section chain" aria-labelledby="chain-heading">
+        <div class="section-top"><span>03 / THE CHAIN</span><span>ひと言が、次のひと言を呼ぶ</span></div>
+        <div class="chain-head">
+          <h2 id="chain-heading" class="section-title" data-split>ぜんぶ、<br />つながってる。</h2>
+          <p class="section-lead" data-reveal>「お祭り男ォ！」から「良かったこの距離でぇ」まで。スクロールすると、会話の連鎖が一本の線で描かれていきます。</p>
+        </div>
+        <div class="chain-map" data-reveal>
+          <svg class="chain-svg" viewBox="0 0 1200 520" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+            <defs>
+              <linearGradient id="chainGrad" x1="0" x2="1"><stop offset="0" stop-color="#d8ff4f" /><stop offset=".35" stop-color="#b6a2ec" /><stop offset=".6" stop-color="#ffad82" /><stop offset=".8" stop-color="#ff90b4" /><stop offset="1" stop-color="#9fc4ff" /></linearGradient>
+              <filter id="glow"><feGaussianBlur stdDeviation="6" result="b" /><feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
+            </defs>
+            <path class="chain-path-bg" id="chain-bg-a" /><path class="chain-path" id="chain-a" stroke="url(#chainGrad)" filter="url(#glow)" /><path class="chain-path-bg" id="chain-bg-b" /><path class="chain-path chain-path-b" id="chain-b" stroke="#ffd979" filter="url(#glow)" />
+          </svg>
+          <div class="chain-nodes"></div>
+        </div>
+      </section>
+
+      <!-- ============ TEMPERATURE CHART ============ -->
+      <section class="section temp" aria-labelledby="temp-heading">
+        <div class="section-top"><span>04 / THE TEMPERATURE</span><span>声量 × 間 の体感マップ</span></div>
+        <div class="temp-layout">
+          <div class="temp-copy">
+            <h2 id="temp-heading" class="section-title" data-split>声の大きさと、<br />間の長さ。</h2>
+            <p class="section-lead" data-reveal>6つのセリフを「声量」と「言ったあとの間」で並べた、編集部の体感マップ。大声の直後に小声が来るから、おかしい。</p>
+            <p class="temp-note mono" data-reveal>※ 数値は計測値ではなく、編集部の主観による目安です。</p>
+            <div class="temp-legend" data-reveal></div>
+          </div>
+          <div class="temp-chart" data-reveal>
+            <div class="temp-axis-y mono">声量 ↑</div>
+            <div class="temp-axis-x mono">間の長さ →</div>
+            <div class="temp-grid" aria-hidden="true"></div>
+            <div class="temp-dots" role="list"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ ARCHIVE ============ -->
+      <section class="section archive" id="archive" aria-labelledby="archive-heading">
+        <div class="section-top"><span>05 / SIX SPECIAL PAGES</span><span>一言ずつ、もっと深く</span></div>
+        <div class="archive-head">
+          <h2 id="archive-heading" class="section-title" data-split>6つのセリフ。<br />6つの入り口。</h2>
+          <div class="archive-tools" data-reveal>
+            <label class="archive-search"><span class="sr-only">セリフを探す</span><span aria-hidden="true">⌕</span><input id="scene-search" type="search" placeholder="セリフ・発言者・タグで検索" autocomplete="off" /></label>
+            <button type="button" class="btn btn-ghost" id="random-scene">おまかせ <span class="btn-arrow">⟳</span></button>
+          </div>
+          <div class="archive-tags" role="group" aria-label="タグで絞り込む" data-reveal></div>
+          <p class="archive-status mono" role="status" aria-live="polite">6 MOMENTS</p>
+        </div>
+        <div class="archive-grid"></div>
+        <p class="archive-empty" hidden>見つかりませんでした。別の言葉で試してみてください。</p>
+      </section>
+
+      <!-- ============ SAVED ============ -->
+      <section class="section saved" aria-labelledby="saved-heading">
+        <div class="saved-inner">
+          <div><span class="eyebrow">YOUR PICKS</span><h2 id="saved-heading" class="section-title" data-split>あとで見る。</h2></div>
+          <div><p class="section-lead" data-reveal>気に入ったセリフを保存すると、ここに並びます。保存内容はこの端末にだけ残ります。</p><p class="saved-progress mono" data-reveal></p></div>
+        </div>
+        <div class="saved-list" aria-live="polite"></div>
+      </section>
+
+      <!-- ============ SILENCE BREAK ============ -->
+      <section class="silence" aria-label="ネタの間">
+        <div class="silence-pin">
+          <span class="mono silence-label">THE SILENCE IS PART OF IT.</span>
+          <div class="silence-dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <p class="silence-text">……この<strong>間</strong>まで、おもろい。</p>
+          <span class="mono silence-timer" aria-hidden="true">00:00.0</span>
+        </div>
+      </section>
+
+      <!-- ============ WHY IT STICKS ============ -->
+      <section class="section why" aria-labelledby="why-heading">
+        <div class="section-top"><span>06 / WHY IT STICKS</span><span>この妙な空気を分解すると</span></div>
+        <h2 id="why-heading" class="section-title" data-split>なんで、<br />こんなに残る？</h2>
+        <div class="why-grid">
+          <article class="why-card" data-reveal data-tilt><img src="{{base}}img/m01-lanterns-sm.webp" alt="" loading="lazy" /><span class="mono">01 / CALL</span><div class="why-glyph" aria-hidden="true">↗</div><h3>いきなり呼ぶ。</h3><p>登場した宮川大好に「お祭り男ォ！」。紹介のようでツッコミのような、絶妙に説明しきれない一声。</p></article>
+          <article class="why-card" data-reveal data-delay=".1" data-tilt><img src="{{base}}img/m02-lone-lantern-sm.webp" alt="" loading="lazy" /><span class="mono">02 / REPEAT</span><div class="why-glyph" aria-hidden="true">↘</div><h3>小さく繰り返す。</h3><p>後から聞こえる「ｵﾏﾂﾘｵﾄｺｶ…」。声量の落差で、同じ言葉がもう一度おかしくなる。</p></article>
+          <article class="why-card" data-reveal data-delay=".2" data-tilt><img src="{{base}}img/m05-measure-sm.webp" alt="" loading="lazy" /><span class="mono">03 / DISTANCE</span><div class="why-glyph" aria-hidden="true">↔</div><h3>距離で返す。</h3><p>「しばくぞ」と怒られて「良かったこの距離でぇ」。言い返す場所がそこなのか、というズレが残る。</p></article>
+        </div>
+      </section>
+
+      <!-- ============ ABOUT ============ -->
+      <section class="about" aria-labelledby="about-heading">
+        <div class="about-media" aria-hidden="true"><img src="{{base}}img/stage-beams.webp" alt="" data-parallax="10" loading="lazy" /></div>
+        <div class="about-inner">
+          <div class="about-stamp latin" aria-hidden="true">O<br />M<br />O<br />R<br />O</div>
+          <div class="about-copy">
+            <span class="eyebrow">THE ORIGINAL EPISODE</span>
+            <h2 id="about-heading" class="section-title" data-split>10年越しに、<br />また笑う。</h2>
+            <p data-reveal>2016年9月21日放送の『水曜日のダウンタウン』特別編『水曜日のダウソタウソ』。ダウンタウンのものまねコンビが司会を務め、宮川大好らものまね芸人が出演した回です。2026年、当時のやり取りがネット上で再び話題になりました。</p>
+            <div class="about-links" data-reveal><a class="btn btn-ghost" href="https://www.tbs.co.jp/suiyobinodowntown/" target="_blank" rel="noopener noreferrer">番組公式サイト <span class="btn-arrow">↗</span></a><a class="btn btn-ghost" href="https://natalie.mu/owarai/news/202469" target="_blank" rel="noopener noreferrer">当時の放送記事 <span class="btn-arrow">↗</span></a></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ CTA ============ -->
+      <section class="section cta" aria-label="ほかのページ">
+        <a class="cta-card cta-gallery" href="{{base}}gallery/" data-cursor="ENTER">
+          <img src="{{base}}img/stage-blue.webp" alt="" loading="lazy" />
+          <span class="mono">NEW / 3D GALLERY</span>
+          <strong>浮かぶ6枚を、<br />歩いて見る。</strong>
+          <em>ドラッグで回転・スクロールで移動 ↗</em>
+        </a>
+        <a class="cta-card cta-lab" href="{{base}}lab/" data-cursor="PLAY">
+          <img src="{{base}}img/confetti.webp" alt="" loading="lazy" />
+          <span class="mono">OMORO LAB</span>
+          <strong>見て、当てて、<br />つくって遊ぶ。</strong>
+          <em>クイズ・カード・距離・間チャレンジ ↗</em>
+        </a>
+      </section>
+    </main>
+
+    <!--#include footer -->
+  </body>
+</html>

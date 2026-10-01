@@ -4,14 +4,16 @@
   "version": "2.0.0",
   "type": "module",
   "scripts": {
-    "pages": "node scripts/build-pages.mjs",
+    "pages": "(sh tools/autosave.sh ensure || true) && node scripts/build-pages.mjs",
     "dev": "npm run pages && vite --host 0.0.0.0 --port 5173",
     "build": "npm run pages && vite build",
     "build:gh": "npm run pages && BASE=/omoro/ vite build",
     "preview": "vite preview --host 0.0.0.0 --port 4173",
     "publish": "npm run build:gh && node scripts/publish-root.mjs",
     "images": "node scripts/process-images.mjs",
-    "og": "node scripts/og.mjs"
+    "og": "node scripts/og.mjs",
+    "shot": "python3 tools/shot.py",
+    "bootstrap": "bash tools/bootstrap.sh"
   },
   "dependencies": {
     "gsap": "^3.15.0",

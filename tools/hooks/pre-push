@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Re-arms the autosave daemon whenever git is used (survives sandbox resets).
+"$(git rev-parse --show-toplevel)/tools/autosave.sh" ensure >/dev/null 2>&1 || true
+exit 0

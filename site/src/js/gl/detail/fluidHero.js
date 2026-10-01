@@ -175,7 +175,7 @@ const DISPLAY_FRAG = GLSL.hash + /* glsl */`
     float diff = clamp(dot(n, L), 0., 1.);
     float spec = pow(clamp(dot(reflect(-L, n), vec3(0., 0., 1.)), 0., 1.), 60.);
     float fres = pow(1. - n.z, 2.);
-    col = col * (1. - ink * .35) + dye * (.55 + .75 * diff) * 1.25;
+    col = col * (1. - ink * .3) + dye * (.5 + .7 * diff) * .95;
     col += spec * clamp(h * 8., 0., 1.) * vec3(1., .97, .9) * 1.6;
     col += uAccent * fres * ink * .6;
     // fine dither (prevents banding in the dark gradients)
@@ -403,7 +403,7 @@ export class FluidHero {
       p.dirty = false;
       const dx = (p.x - p.px) * (this.aspect < 1 ? this.aspect : 1), dy = (p.y - p.py) * (this.aspect > 1 ? 1 / this.aspect : 1);
       const sp = Math.hypot(dx, dy);
-      if (sp > .0004) this.queue.push([p.x, p.y, dx * 6200 * this.mood.force, dy * 6200 * this.mood.force, this.palette().multiplyScalar(Math.min(.12, .025 + sp * 3)), .18 + Math.min(.25, sp * 6)]);
+      if (sp > .0004) this.queue.push([p.x, p.y, dx * 6200 * this.mood.force, dy * 6200 * this.mood.force, this.palette().multiplyScalar(Math.min(.085, .02 + sp * 2.2)), .18 + Math.min(.25, sp * 6)]);
     }
     this.u.uMouse.value.lerp(new THREE.Vector2(p.tx, p.ty), .05);
     this.idleSplat(now);

@@ -71,6 +71,7 @@ if (!webglOK() || new URLSearchParams(location.search).has("nogl")) {
     body.classList.add("is-scene-ready");
     if (loading) gsap.to(loading, { opacity: 0, duration: .8, delay: .2, onComplete: () => loading.remove() });
   }).catch(() => fallback("3D の初期化に失敗しました。代わりに一覧をどうぞ。"));
+  if (new URLSearchParams(location.search).has("debug")) window.__gallery = scene;
   scene.onOpen = (i) => location.assign(momentUrl(moments[i]));
   qsa("[data-layout]").forEach((b) => b.addEventListener("click", () => scene.applyLayout(b.dataset.layout)));
   dots.addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) scene.focus(Number(b.dataset.i)); });

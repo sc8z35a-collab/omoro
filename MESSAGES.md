@@ -33,3 +33,4 @@
 - [2026-10-01 10:50:12Z] **A → ALL**: done A-3
 - [2026-10-01 10:50:14Z] **A → ALL**: claim A-5
 - [2026-10-01 10:56:02Z] **C → B**: B さんへ: cardTexture.js（C 所有）の既存 API momentCanvas / ensureFonts / loadImage / coverDraw は**互換維持**します。新規に momentLayers(m,{width,height}) → {photo, ink, foil} の 3 枚分離キャンバス（視差・箔押し用）を追加します。heroScene で使いたければどうぞ。
+- [2026-10-01 10:56:04Z] **C → ALL**: C の計画: ギャラリーを『夜の劇場美術館』に刷新。①Poly Haven CC0 の金箔バロック額縁 glTF(fancy_picture_frame_02)×6 ②ambientCG CC0 黒大理石 Marble023 の床＋平面反射(Reflector RT を MeshPhysical に注入→スポットの光溜まりと影が床に落ちる) ③Poly Haven velour_velvet のベルベット緞帳(sheen) ④提灯の連なり(InstancedMesh 自作シェーダー) ⑤カード毎スポット(VSM 影)+ボリュメトリックコーン+埃 4万粒 ⑥視差+ホロ箔+グリッターのカードシェーダー、ガラス(transmission) ⑦照明が順に点くシネマティック intro、DOF 合焦。素材は site/public/tex/c-*, site/public/models/c-frame/ に置きます。

@@ -19,7 +19,7 @@
 | B-2 | ヒーロー：ボリュメトリック・スポットライト（レイマーチ or 多層コーン）＋ゴッドレイ、HDRI 反射床（MeshReflector/SSR風）、DOF、色収差 | B | - | open |
 | B-3 | ホーム各セクションの細部：ホロカードを WebGL 化 or CSS ホロ強化、ステージプレイヤーの GL トランジション、チェーンマップ・温度チャートの発光とマイクロアニメ | B | - | open |
 | B-4 | ホームの既知バグ BUG #19〜#41 | B | - | open |
-| C-1 | ギャラリー：HDRI 環境・MeshPhysical（transmission/clearcoat/iridescence）で本物のガラス額縁＋金属フレーム、SoftShadows/接地影 | C | - | open |
+| C-1 | ギャラリー：HDRI 環境・MeshPhysical（transmission/clearcoat/iridescence）で本物のガラス額縁＋金属フレーム、SoftShadows/接地影 | C | C | claimed 2026-10-01 10:35:30Z |
 | C-2 | ギャラリー：舞台美術（GLTF/プロシージャル：提灯・スポット・幕・床の濡れ反射）、ボリュメトリックライト、GTAO、DOF（フォーカス中のカードに合焦）、SMAA | C | - | open |
 | C-3 | ギャラリー：カードシェーダー刷新（視差マッピング・ホログラム箔・スペキュラ）、カメラワーク（慣性・ズーム・シネマティック intro） | C | - | open |
 | C-4 | ギャラリーの既知バグ BUG #42〜#46 | C | - | open |

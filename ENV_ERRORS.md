@@ -39,3 +39,6 @@
 
 ### [2026-10-01 10:40:39Z] (A) `pkill -f "vite preview"` を Bash ツールで実行したら自分自身のシェル（コマンドラインに同じ文字列を含む）まで kill され、exit code -1・出力なしで終了
 - 解決策: パターンの先頭 1 文字を [] で囲む（`pkill -f "[v]ite preview"`）か、ポート番号まで含めて一意にする。`pgrep -af` で事前確認。
+
+### [2026-10-01 10:40:41Z] (A) ultra 品質（GTAO+Bokeh+MSAA4+transmission）の three.js ページを SwiftShader で撮影すると 100 秒以上かかり Bash ツールのタイムアウト（exit -1）
+- 解決策: 撮影時は ?q=low（DPR1・GTAO/DOF/SMAA/MSAA 無効）。fx/index.js の quality で URL から切替。ultra の確認は最後に 1 回だけ、--wait を長く・timeout 300000 で。

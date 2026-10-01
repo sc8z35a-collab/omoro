@@ -9,7 +9,7 @@
 | ID | 内容 | 想定担当 | 担当 | 状態 |
 |---|---|---|---|---|
 | A-1 | 自動保存システム（tools/autosave.sh・hooks・bootstrap）設計と稼働 | A | A | done 2026-10-01 10:30:11Z |
-| A-2 | 共有ネットワーク（collab ブランチ・board.sh・各種 md）構築 | A | A | claimed 2026-10-01 10:35:00Z |
+| A-2 | 共有ネットワーク（collab ブランチ・board.sh・各種 md）構築 | A | A | done 2026-10-01 10:40:17Z |
 | A-3 | 共通 GL 基盤 `site/src/js/gl/fx/`（renderer/HDRI/composer/UltraFinalPass/quality） | A | A | claimed 2026-10-01 10:40:15Z |
 | A-4 | 共通 chrome の超高品質化：WebGL カーソル残像 or 流体、ページ遷移を GL シェーダーに、ローダー刷新、grain を GL ノイズに | A | - | open |
 | A-5 | 共通 UI バグ修正 BUG #1〜#18, #64, #65（chrome.js / base.css / partials） | A | - | open |

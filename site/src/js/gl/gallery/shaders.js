@@ -49,7 +49,7 @@ export const cardFrag = /* glsl */`
 
     // ---- mid layer: etched ghost number
     vec4 mMid = texture2D(uMask, vUv - par * .014);
-    photo += vec3(.9, .95, 1.) * mMid.g * .06 + uAccent * mMid.g * .035;
+    photo = mix(photo, photo * 1.25 + vec3(.04), mMid.g * .35);
 
     // ---- surface: ink + foil + glitter
     vec4 ink = texture2D(uInk, vUv);
@@ -81,7 +81,7 @@ export const cardFrag = /* glsl */`
     col *= mix(.25, 1., lip);
     col *= mix(.5, 1., smoothstep(.0, .16, 1. - vUv.y));            // frame top casts a shadow (spot is above)
     float pool = smoothstep(.95, .05, length((vUv - vec2(.5, .66)) * vec2(1.05, .85)));
-    col *= (.55 + .75 * pool) * mix(.25, 1., uLight) * (1. + uHover * .25);
+    col *= (.75 + .55 * pool) * mix(.2, 1.12, uLight) * (1. + uHover * .2);
     col += uAccent * pow(1. - max(V.z, 0.), 3.) * uHover * .25;
 
     // dim (other cards while one is focused) — darker and a touch desaturated

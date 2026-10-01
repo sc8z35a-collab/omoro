@@ -162,8 +162,8 @@ export class GalleryScene {
     glass.position.z = .07; glass.userData.index = i;
     inner.add(glass);
     // velvet back board + brass plaque under the frame
-    const back = new THREE.Mesh(new THREE.BoxGeometry(CARD_W + 1.05, CARD_H + 1.15, .06), new THREE.MeshPhysicalMaterial({ color: 0x0d0b0c, roughness: .9, sheen: 1, sheenColor: new THREE.Color(m.accent).multiplyScalar(.35), sheenRoughness: .5 }));
-    back.position.z = -.09; back.receiveShadow = true; back.castShadow = true;
+    const back = new THREE.Mesh(new THREE.BoxGeometry(CARD_W + .62, CARD_H + 1.0, .05), this.boardMat(m.accent));
+    back.position.set(0, -.2, -.09); back.receiveShadow = true; back.castShadow = true;
     inner.add(back);
     const plaque = new THREE.Mesh(new THREE.BoxGeometry(1.1, .2, .03), new THREE.MeshPhysicalMaterial({ map: this.plaqueTexture(m), metalness: 1, roughness: .32, color: 0xd9b56b, clearcoat: .6 }));
     plaque.position.set(0, -CARD_H / 2 - .5, .02); plaque.castShadow = true;
@@ -178,7 +178,7 @@ export class GalleryScene {
     this.world.add(glow);
 
     // per-card key light: spot from above-front, soft VSM shadow
-    const spot = new THREE.SpotLight(new THREE.Color("#fff1dc").lerp(new THREE.Color(m.accent), .22), 0, 18, .34, .6, 1.6);
+    const spot = new THREE.SpotLight(new THREE.Color("#fff1dc").lerp(new THREE.Color(m.accent), .18), 0, 20, .3, .55, 1.7);
     spot.castShadow = true;
     spot.shadow.mapSize.set(quality.tier === "low" ? 512 : 2048, quality.tier === "low" ? 512 : 2048);
     spot.shadow.radius = 9; spot.shadow.blurSamples = 16; spot.shadow.bias = -.0004; spot.shadow.normalBias = .02;
@@ -203,6 +203,11 @@ export class GalleryScene {
     g.textAlign = "right"; g.font = `500 28px "JetBrains Mono", monospace`; g.fillText(m.en.toUpperCase().slice(0, 30), 980, 64);
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = this.maxAniso;
     return t;
+  }
+  boardMat(accent) {
+    this._velvetTex ||= ["tex/c-velvet-col.webp", "tex/c-velvet-nor.webp"].map((p, k) => { const t = this.tx(p, { srgb: k === 0 }); t.repeat.set(2, 2.5); return t; });
+    return new THREE.MeshPhysicalMaterial({ color: new THREE.Color(0x231417).lerp(new THREE.Color(accent), .08), map: this._velvetTex[0], normalMap: this._velvetTex[1], roughness: .95,
+      sheen: 1, sheenRoughness: .45, sheenColor: new THREE.Color(accent).multiplyScalar(.5), envMapIntensity: .2 });
   }
   brassMat() {
     return this._brass ||= new THREE.MeshPhysicalMaterial({ color: 0xc9a25a, metalness: 1, roughness: .26, clearcoat: .5, clearcoatRoughness: .2 });
@@ -246,10 +251,10 @@ export class GalleryScene {
 
     const rep = 7;
     const mat = this.floorMat = new THREE.MeshPhysicalMaterial({
-      color: 0x45454c, map: this.tx("tex/c-marble-col.webp", { srgb: true, repeat: rep }),
+      color: 0x2a2a30, map: this.tx("tex/c-marble-col.webp", { srgb: true, repeat: rep }),
       normalMap: this.tx("tex/c-marble-nor.webp", { repeat: rep }), normalScale: new THREE.Vector2(.55, .55),
       roughnessMap: this.tx("tex/c-marble-rough.webp", { repeat: rep }),
-      roughness: .5, metalness: 0, clearcoat: 1, clearcoatRoughness: .06, envMapIntensity: .22
+      roughness: .62, metalness: 0, clearcoat: .35, clearcoatRoughness: .08, envMapIntensity: .06
     });
     mat.onBeforeCompile = (sh) => {
       sh.uniforms.tReflect = { value: rt.texture };
@@ -626,7 +631,7 @@ export class GalleryScene {
       const tp = this.world.worldToLocal(wp.clone().add(new THREE.Vector3(0, -.3, 0)));
       c.spot.position.copy(lp); c.spot.target.position.copy(tp);
       const dim = 1 - u.uDim.value * .55;
-      c.spot.intensity = c.light * (150 + h * 90) * dim;
+      c.spot.intensity = c.light * (260 + h * 160) * dim;
       // beam geometry: orient from lamp to target
       c.beam.position.copy(lp);
       const dir = tp.clone().sub(lp).normalize();

@@ -80,7 +80,9 @@
         </div>
         <div class="player-layout">
           <nav class="player-list" aria-label="名場面を選択"></nav>
-          <article class="stage" id="stage" aria-live="polite">
+          <article class="stage" id="stage" aria-roledescription="スライド" aria-label="ステージ">
+            <canvas class="stage-gl" aria-hidden="true"></canvas>
+            <p class="sr-only stage-announce" aria-live="polite"></p>
             <div class="stage-media" aria-hidden="true"><img class="stage-img" alt="" /><img class="stage-img stage-img-next" alt="" /></div>
             <div class="stage-shade" aria-hidden="true"></div>
             <div class="stage-top mono"><span class="stage-live"><i></i> MOMENT <b class="stage-num">01</b> / 06</span><span class="stage-tags"></span></div>
@@ -188,9 +190,9 @@
         <div class="section-top"><span>06 / WHY IT STICKS</span><span>この妙な空気を分解すると</span></div>
         <h2 id="why-heading" class="section-title" data-split>なんで、<br />こんなに残る？</h2>
         <div class="why-grid">
-          <article class="why-card" data-reveal data-tilt><img src="{{base}}img/m01-lanterns-sm.webp" alt="" loading="lazy" /><span class="mono">01 / CALL</span><div class="why-glyph" aria-hidden="true">↗</div><h3>いきなり呼ぶ。</h3><p>登場した宮川大好に「お祭り男ォ！」。紹介のようでツッコミのような、絶妙に説明しきれない一声。</p></article>
-          <article class="why-card" data-reveal data-delay=".1" data-tilt><img src="{{base}}img/m02-lone-lantern-sm.webp" alt="" loading="lazy" /><span class="mono">02 / REPEAT</span><div class="why-glyph" aria-hidden="true">↘</div><h3>小さく繰り返す。</h3><p>後から聞こえる「ｵﾏﾂﾘｵﾄｺｶ…」。声量の落差で、同じ言葉がもう一度おかしくなる。</p></article>
-          <article class="why-card" data-reveal data-delay=".2" data-tilt><img src="{{base}}img/m05-measure-sm.webp" alt="" loading="lazy" /><span class="mono">03 / DISTANCE</span><div class="why-glyph" aria-hidden="true">↔</div><h3>距離で返す。</h3><p>「しばくぞ」と怒られて「良かったこの距離でぇ」。言い返す場所がそこなのか、というズレが残る。</p></article>
+          <div class="why-slot" data-reveal><article class="why-card" data-tilt><i class="why-foil" aria-hidden="true"></i><img src="{{base}}img/m01-lanterns-sm.webp" alt="" loading="lazy" /><span class="mono">01 / CALL</span><div class="why-glyph" aria-hidden="true">↗</div><h3>いきなり呼ぶ。</h3><p>登場した宮川大好に「お祭り男ォ！」。紹介のようでツッコミのような、絶妙に説明しきれない一声。</p></article></div>
+          <div class="why-slot" data-reveal data-delay=".1"><article class="why-card" data-tilt><i class="why-foil" aria-hidden="true"></i><img src="{{base}}img/m02-lone-lantern-sm.webp" alt="" loading="lazy" /><span class="mono">02 / REPEAT</span><div class="why-glyph" aria-hidden="true">↘</div><h3>小さく繰り返す。</h3><p>後から聞こえる「ｵﾏﾂﾘｵﾄｺｶ…」。声量の落差で、同じ言葉がもう一度おかしくなる。</p></article></div>
+          <div class="why-slot" data-reveal data-delay=".2"><article class="why-card" data-tilt><i class="why-foil" aria-hidden="true"></i><img src="{{base}}img/m05-measure-sm.webp" alt="" loading="lazy" /><span class="mono">03 / DISTANCE</span><div class="why-glyph" aria-hidden="true">↔</div><h3>距離で返す。</h3><p>「しばくぞ」と怒られて「良かったこの距離でぇ」。言い返す場所がそこなのか、というズレが残る。</p></article></div>
         </div>
       </section>
 

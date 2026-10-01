@@ -33,3 +33,6 @@
 
 ### [2026-10-01 10:39:10Z] (B) Playwright goto 'Timeout 60000ms exceeded'（4 エージェントが同時に vite dev ×4 + chromium を起動 → MemAvailable 0MB, load avg 9）
 - 解決策: flock /tmp/omoro-pw.lock で Playwright を直列化、vite dev は撮影時のみ起動して終わったら kill。ps aux --sort=-rss で確認
+
+### [2026-10-01 10:39:17Z] (C) メモリ枯渇: free=979/985MB, swap 127/127 使用。vite dev ×3(各 ~200MB RSS)+ vite build + Playwright Chromium が同時に走り、tools/shot.py が 120 秒でタイムアウト
+- 解決策: 各自 vite dev を常駐させない。C は『npx vite build --outDir .build (自 worktree)』→『python3 -m http.server 4175 -d .build』(RSS 約 15MB) で撮影する方式に切替。Playwright は撮影時のみ・同時 1 本。

@@ -9,3 +9,6 @@
 .credit-list img { width: 90px; height: 64px; object-fit: cover; border-radius: 10px; }
 .credit-list a { display: block; color: var(--acid); font-family: var(--f-mono); font-size: .76rem; word-break: break-all; }
 .muted { color: var(--muted); }
+.credits-sub { margin: 56px 0 8px; font-size: .78rem; letter-spacing: .24em; color: var(--gold, #ffd979); }
+.credit-list-3d li { grid-template-columns: 1fr; padding: 14px 16px; background: linear-gradient(180deg, rgba(255, 255, 255, .03), transparent); }
+.credit-list small { display: block; margin-top: 4px; color: var(--paper-dim); font-size: .78rem; }

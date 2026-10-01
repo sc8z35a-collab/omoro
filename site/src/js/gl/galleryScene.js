@@ -48,7 +48,7 @@ export class GalleryScene {
     scene.add(this.world);
 
     const aniso = r.capabilities.getMaxAnisotropy();
-    this.floor = createMarbleFloor(r, scene, { y: FLOOR_Y, res: quality.tier === "low" ? 512 : 2048, aniso });
+    this.floor = createMarbleFloor(r, scene, { y: FLOOR_Y, res: quality.tier === "low" ? 512 : 2048, aniso, samples: quality.tier === "low" ? 0 : 4 });
     scene.add(this.floor.mesh);
     this.curtain = createCurtain({ radius: 21, height: 18, y: FLOOR_Y, aniso });
     scene.add(this.curtain.mesh);
@@ -70,7 +70,9 @@ export class GalleryScene {
       const ring = new THREE.Mesh(new THREE.TorusGeometry(rad, .025, 16, 160), brass);
       ring.rotation.set(k * .9, k * .6, 0); ring.castShadow = true; this.armillary.add(ring);
     });
-    const orb = new THREE.Mesh(new THREE.SphereGeometry(.32, 64, 32), new THREE.MeshPhysicalMaterial({ color: 0xffffff, transmission: 1, thickness: .6, roughness: .04, ior: 1.5, iridescence: 1, iridescenceIOR: 1.3, dispersion: 4, envMapIntensity: 1.4 }));
+    const orb = new THREE.Mesh(new THREE.SphereGeometry(.32, 64, 32), quality.tier === "low"
+      ? new THREE.MeshStandardMaterial({ color: 0x222222, metalness: 1, roughness: .05 })
+      : new THREE.MeshPhysicalMaterial({ color: 0xffffff, transmission: 1, thickness: .6, roughness: .04, ior: 1.5, iridescence: 1, iridescenceIOR: 1.3, dispersion: 4, envMapIntensity: 1.4 }));
     this.armillary.add(orb);
     this.orbLight = new THREE.PointLight(0xd8ff4f, 0, 6, 2);
     this.armillary.add(this.orbLight);
@@ -98,6 +100,11 @@ export class GalleryScene {
       const additive = () => [this.dust.points, ...this.cards.map((c) => c.cone.mesh), ...this.cards.map((c) => c.glass).filter(Boolean)];
       dof.render = (...a) => { const list = additive(); list.forEach((o) => (o.visible = false)); orig(...a); list.forEach((o) => (o.visible = true)); };
     }
+
+    // compile every program up-front (KHR_parallel_shader_compile) so the first frame doesn't stall
+    try { await r.compileAsync(scene, this.camera); } catch { /* older drivers */ }
+    // a lost context (driver reset / GPU watchdog) must never leave a black page
+    this.canvas.addEventListener("webglcontextlost", (e) => { e.preventDefault(); this.lost = true; this.onContextLost?.(); }, { once: true });
 
     this.raycaster = new THREE.Raycaster();
     this.timer = new THREE.Timer();
@@ -236,7 +243,7 @@ export class GalleryScene {
 
   /* ---------------------------------------------------------------- frame */
   tick() {
-    if (!this.gate.active() || this.paused) return;
+    if (!this.gate.active() || this.paused || this.lost) return;
     const t0 = performance.now();
     this.timer.update();
     const t = this.timer.getElapsed(), dt = Math.min(this.timer.getDelta(), .05);

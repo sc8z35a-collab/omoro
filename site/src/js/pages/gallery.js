@@ -75,6 +75,7 @@ if (!webglOK() || new URLSearchParams(location.search).has("nogl")) {
     });
     scene.onOpen = (i) => location.assign(momentUrl(moments[i]));
     window.__gallery = scene; // debug / screenshot harness hook
+    scene.onContextLost = () => { console.warn("[gallery] WebGL context lost — switching to the list view"); fallback(); };
     qsa("[data-layout]").forEach((b) => b.addEventListener("click", () => scene.applyLayout(b.dataset.layout)));
     dots.addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) scene.focus(Number(b.dataset.i)); });
     qs(".g-prev").addEventListener("click", () => scene.next(-1));

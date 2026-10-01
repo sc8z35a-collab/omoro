@@ -21,8 +21,8 @@ export function tex(path, { srgb = false, repeat = 1, aniso = 8 } = {}) {
 
 /* ------------------------------------------------------------------ floor */
 // A Reflector-style render target, but the result is fed into a PBR material (not an unlit mirror).
-export function createMarbleFloor(renderer, scene, { size = 90, y = -2.2, res = 1024, aniso = 8 } = {}) {
-  const rt = new THREE.WebGLRenderTarget(res, res, { type: THREE.HalfFloatType, samples: 4 });
+export function createMarbleFloor(renderer, scene, { size = 90, y = -2.2, res = 1024, aniso = 8, samples = 4 } = {}) {
+  const rt = new THREE.WebGLRenderTarget(res, res, { type: THREE.HalfFloatType, samples });
   const reflCam = new THREE.PerspectiveCamera();
   const texMatrix = new THREE.Matrix4();
   const geo = new THREE.PlaneGeometry(size, size, 1, 1);

@@ -368,7 +368,7 @@ export class HeroScene {
   /* ------------------------------------------------------------ distant photo cards */
   async buildCards() {
     const group = this.cardGroup = new THREE.Group();
-    group.position.set(0, .9, -15.5);
+    group.position.set(0, .4, -17.5);
     this.root.add(group);
     const radius = 7.2, step = Math.PI * 2 / this.moments.length;
     const canvases = await Promise.all(this.moments.map((m) => momentCanvas(m, { width: 640, height: 874, small: true })));
@@ -377,7 +377,7 @@ export class HeroScene {
       tex.colorSpace = THREE.SRGBColorSpace;
       tex.anisotropy = this.renderer.capabilities.getMaxAnisotropy();
       const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity: 0, side: THREE.DoubleSide, fog: true, toneMapped: true });
-      mat.color.setScalar(.55);
+      mat.color.setScalar(.32);
       const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 3.55), mat);
       const a = i * step;
       mesh.position.set(Math.sin(a) * radius, 0, Math.cos(a) * radius);

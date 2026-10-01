@@ -24,3 +24,6 @@
 
 ### [2026-10-01 10:24Z] (A) Bash ツールで `for u in https://...?a=b&c=d` のように URL をクォートしないと `syntax error near unexpected token '&'`
 - 解決策: URL は必ず `"..."` で囲む。
+
+### [2026-10-01 10:35:55Z] (C) worktree で ln -s ../../node_modules node_modules すると .gitignore の 'node_modules/'（末尾スラッシュ=ディレクトリのみ）にマッチせず、シンボリックリンクが untracked になり autosave がコミットしてしまう
+- 解決策: 共通の $(git rev-parse --git-common-dir)/info/exclude に 'node_modules' を追記（C が実施済み・全 worktree に効く）。A は .gitignore を 'node_modules' に変更推奨

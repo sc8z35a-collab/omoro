@@ -46,6 +46,7 @@ async function bootHero() {
     hero = new HeroScene(heroCanvas, moments);
     await hero.ready;
     qs(".hero").classList.add("is-gl");
+    const cnt = qs(".hero-rail-count"); if (cnt) cnt.textContent = hero.particleCount.toLocaleString("en-US");
   } catch (err) {
     console.error("[hero] WebGL init failed, falling back", err);
     hero = null; heroCanvas.remove(); chips.hidden = true; qs(".hero").classList.add("is-nogl");

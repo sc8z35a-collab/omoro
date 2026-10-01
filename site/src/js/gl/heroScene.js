@@ -123,7 +123,7 @@ export class HeroScene {
     const err = gpu.init();
     if (err) throw new Error(err);
 
-    const N = size * size;
+    const N = this.particleCount = size * size;
     const ref = new Float32Array(N * 2);
     for (let i = 0; i < N; i++) { ref[i * 2] = ((i % size) + .5) / size; ref[i * 2 + 1] = (Math.floor(i / size) + .5) / size; }
     const geo = new THREE.BufferGeometry();

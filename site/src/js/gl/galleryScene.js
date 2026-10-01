@@ -505,8 +505,8 @@ export class GalleryScene {
   /* ============================================================ layouts & focus */
   layoutFor(kind, i) {
     const n = this.moments.length, a = i / n * Math.PI * 2;
-    if (kind === "ring") { const R = 7; return { p: [Math.sin(a) * R, 0, Math.cos(a) * R], r: [0, a, 0], a }; }
-    if (kind === "helix") { const R = 5.6, aa = i / n * Math.PI * 2.4; return { p: [Math.sin(aa) * R, i * 1.05 - 2.2, Math.cos(aa) * R], r: [0, aa, 0], a: aa }; }
+    if (kind === "ring") { const R = 7; return { p: [Math.sin(a) * R, 0, Math.cos(a) * R], r: [0, a * .55, 0], a }; }
+    if (kind === "helix") { const R = 5.6, aa = i / n * Math.PI * 2.4; return { p: [Math.sin(aa) * R, i * 1.05 - 2.2, Math.cos(aa) * R], r: [0, aa * .6, 0], a: aa }; }
     const col = i % 3, row = Math.floor(i / 3);
     const x = (col - 1) * 3.6, y = (0.5 - row) * 4.5 + .7;
     return { p: [x, y, 1.2 - Math.abs(col - 1) * .9], r: [0, -(col - 1) * .26, 0], a: 0 };
@@ -590,16 +590,18 @@ export class GalleryScene {
     if (!this.gate.active()) return;
     this.timer.update();
     const t = this.timer.getElapsed();
+    const dt = Math.min(this.timer.getDelta(), .5);
+    const f = (k) => 1 - Math.pow(1 - k, dt * 60);      // frame-rate independent damping (k = per-60fps-frame)
     const autoSpin = !this.drag.on && this.focused < 0 && this.layout !== "wall" && !reduced;
-    if (autoSpin) this.rotTarget += .0009;
-    this.rotTarget += this.rotVel; this.rotVel *= .94;
-    this.rotY += (this.rotTarget - this.rotY) * .055;
-    this.travel += (this.travelTarget - this.travel) * .06;
+    if (autoSpin) this.rotTarget += .054 * dt;
+    this.rotTarget += this.rotVel * dt * 60; this.rotVel *= Math.pow(.94, dt * 60);
+    this.rotY += (this.rotTarget - this.rotY) * f(.055);
+    this.travel += (this.travelTarget - this.travel) * f(.06);
     this.world.rotation.y = this.layout === "wall" ? 0 : this.rotY;
     this.world.position.y = -this.travel;
     this.stage.rotation.y = this.layout === "wall" ? 0 : this.rotY * .35;    // architecture turns slower = parallax depth
     const px = this.pointer.x > 5 ? 0 : this.pointer.x, py = this.pointer.y > 5 ? 0 : this.pointer.y;
-    this.pSmooth.x += (px - this.pSmooth.x) * .06; this.pSmooth.y += (py - this.pSmooth.y) * .06;
+    this.pSmooth.x += (px - this.pSmooth.x) * f(.06); this.pSmooth.y += (py - this.pSmooth.y) * f(.06);
 
     // hover (frames and prints both pick)
     this.raycaster.setFromCamera(this.pointer, this.camera);
@@ -614,7 +616,7 @@ export class GalleryScene {
       const u = c.mat.uniforms;
       u.uTime.value = t; u.uPointer.value.copy(this.pSmooth);
       const on = i === this.hovered || i === this.focused ? 1 : 0;
-      u.uHover.value += (on - u.uHover.value) * .08;
+      u.uHover.value += (on - u.uHover.value) * f(.08);
       const h = u.uHover.value;
       c.inner.position.z = h * .22;
       c.inner.position.y = reduced ? 0 : Math.sin(t * .7 + i * 1.3) * .06;
@@ -665,9 +667,9 @@ export class GalleryScene {
       target = new THREE.Vector3(this.pSmooth.x * 1.1 + drift, 1.6 + this.pSmooth.y * .5, z);
       look = new THREE.Vector3(0, this.layout === "wall" ? .9 : .3, 0);
     }
-    if (!this.introTl || !this.introTl.isActive()) this.camera.position.lerp(target, reduced ? 1 : .045);
-    else { this.camera.position.x += (target.x - this.camera.position.x) * .03; }
-    this.lookAt.lerp(look, reduced ? 1 : .07);
+    if (!this.introTl || !this.introTl.isActive()) this.camera.position.lerp(target, reduced ? 1 : f(.045));
+    else { this.camera.position.x += (target.x - this.camera.position.x) * f(.03); }
+    this.lookAt.lerp(look, reduced ? 1 : f(.07));
     this.camera.lookAt(this.lookAt);
     this.fx.setFocus(this.camera.position.distanceTo(this.focused >= 0 ? wp : this.lookAt.clone().add(new THREE.Vector3(0, 0, 7))));
     this.fx.render();

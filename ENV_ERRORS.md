@@ -1,0 +1,26 @@
+# 開発環境で実際に起きたエラーと解決策（全員追記・最終的に docs/DEV_ENV_ERRORS.md に集約）
+
+書式: `tools/board.sh error <AGENT> "症状（エラーメッセージそのまま）" "解決策"`
+**この制作物固有のバグではなく、開発環境（サンドボックス・ツール・git・ブラウザ・ネットワーク等）の問題** を書く。
+
+### [2026-10-01 10:24Z] (A) Playwright の Chromium が起動しない: `error while loading shared libraries: libatk-1.0.so.0: cannot open shared object file`
+- 解決策: `pip install playwright && python3 -m playwright install chromium` の後に **`sudo python3 -m playwright install-deps chromium`**（apt で依存ライブラリを入れる。約 15 秒）。
+
+### [2026-10-01 10:25Z] (A) `python3 -c "import playwright"` → `ModuleNotFoundError`（初期状態ではブラウザも Playwright も無い）
+- 解決策: `pip install playwright` → `python3 -m playwright install chromium`（約 20 秒, 114MB）。キャッシュは `~/.cache/ms-playwright`。
+
+### [2026-10-01 10:26Z] (A) SwiftShader（CPU WebGL）でのスクショが非常に遅い（ホーム 25 秒・2.3fps、ギャラリー 42 秒）
+- 解決策: 起動引数 `--use-gl=angle --use-angle=swiftshader --enable-unsafe-swiftshader --ignore-gpu-blocklist`。`tools/shot.py` の `--wait` を長め（4000〜8000ms）に。GPU は無いので fps はあくまで相対比較用。同時に複数の Playwright を走らせない（1GB RAM）。
+
+### [2026-10-01 10:28Z] (A) 自作 autosave デーモンが 2 回目以降ずっと `skip: another cycle running`
+- 原因: `exec 9>lock; flock -n 9` をループと同じシェルで実行 → fd 9 がロックを保持したまま。しかも `sleep` などの子プロセスが fd 9 を継承し、デーモンを kill してもロックが残った。
+- 解決策: サイクルを `( cycle )` のサブシェルで実行し、子プロセスには `9>&-` で fd を渡さない。`fuser` が無いので `/proc/*/fd` を grep して保持プロセスを特定・kill。
+
+### [2026-10-01 10:29Z] (A) `gh pr view <branch>` が **マージ済みの古い PR** を返し、新しい PR を作らない
+- 解決策: `gh pr list --head <branch> --state open --json number -q length` で「オープンな PR の数」を見る。
+
+### [2026-10-01 10:22Z] (A) リモートの作業ブランチに `__pycache__/*.pyc` がコミットされていた
+- 解決策: `git rm -r --cached docs/debug/__pycache__` ＋ `.gitignore` に `__pycache__/` `*.pyc` を追加。
+
+### [2026-10-01 10:24Z] (A) Bash ツールで `for u in https://...?a=b&c=d` のように URL をクォートしないと `syntax error near unexpected token '&'`
+- 解決策: URL は必ず `"..."` で囲む。

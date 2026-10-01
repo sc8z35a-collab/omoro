@@ -74,6 +74,7 @@ if (!webglOK() || new URLSearchParams(location.search).has("nogl")) {
       onLayout: (k) => qsa("[data-layout]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.layout === k)))
     });
     scene.onOpen = (i) => location.assign(momentUrl(moments[i]));
+    window.__gallery = scene; // debug / screenshot harness hook
     qsa("[data-layout]").forEach((b) => b.addEventListener("click", () => scene.applyLayout(b.dataset.layout)));
     dots.addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) scene.focus(Number(b.dataset.i)); });
     qs(".g-prev").addEventListener("click", () => scene.next(-1));

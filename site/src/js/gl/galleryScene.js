@@ -236,7 +236,8 @@ export class GalleryScene {
 
   /* ---------------------------------------------------------------- frame */
   tick() {
-    if (!this.gate.active()) return;
+    if (!this.gate.active() || this.paused) return;
+    const t0 = performance.now();
     this.timer.update();
     const t = this.timer.getElapsed(), dt = Math.min(this.timer.getDelta(), .05);
     const idle = !this.drag.on && this.focused < 0 && this.layout === "ring" && !this.reduced;
@@ -248,7 +249,7 @@ export class GalleryScene {
     this.world.position.y = -this.travel;
     this.lanterns.group.rotation.y = -this.rotY * .25 + t * .006;
     this.curtain.mesh.rotation.y = this.rotY * .12;
-    this.armillary.rotation.y = t * .18; this.armillary.children.forEach((ring, k) => { if (ring.geometry.type === "TorusGeometry") ring.rotation.z = t * (.1 + k * .07); });
+    this.armillary.rotation.y = t * .18; this.armillary.children.forEach((ring, k) => { if (ring.geometry?.type === "TorusGeometry") ring.rotation.z = t * (.1 + k * .07); });
 
     // pointer smoothing for parallax / torch
     const px = this.pointer.x > 5 ? 0 : this.pointer.x, py = this.pointer.y > 5 ? 0 : this.pointer.y;
@@ -295,6 +296,7 @@ export class GalleryScene {
 
     this.floor.update(this.camera, [this.dust.points]);
     this.fx.render();
+    this.frameMs = performance.now() - t0; this.frames = (this.frames || 0) + 1;
   }
 
   dispose() {

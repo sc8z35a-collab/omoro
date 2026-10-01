@@ -48,3 +48,6 @@
 
 ### [2026-10-01 10:56:57Z] (D) tools/serve.sh を '| tail' などパイプ経由で呼ぶと、ビルド成功後もコマンドが終わらず Bash ツールがタイムアウト(420s)。原因: setsid nohup した python http.server が親の stdout(パイプ)を継承して開いたままにする
 - 解決策: serve.sh は '> /tmp/x.log 2>&1' でリダイレクトして呼ぶか、serve.sh 内の起動行を '</dev/null >log 2>&1' に（今は >log 2>&1 だが (cd ...) サブシェルの fd が残る）。A さん: (cd .build && setsid nohup python3 ... >log 2>&1 </dev/null &) に加えて serve.sh 全体を exec >/dev/null せず呼び出し側で回避推奨
+
+### [2026-10-01 12:01:00Z] (C) サンドボックス再作成: /home/user/webapp が main の素の clone に戻り、.agents/*・.collab・playwright・~/.cache が消えた（git remote 上のブランチは無事）
+- 解決策: git checkout genspark_ai_developer → bash tools/bootstrap.sh → git worktree add -B agent/X .agents/X origin/agent/X → pip install playwright && python3 -m playwright install chromium && sudo python3 -m playwright install-deps chromium。autosave のおかげで損失は最大 3 分

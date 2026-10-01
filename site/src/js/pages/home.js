@@ -45,6 +45,7 @@ async function bootHero() {
     const { HeroScene } = await import("../gl/heroScene.js");
     hero = new HeroScene(heroCanvas, moments);
     await hero.ready;
+    if (new URLSearchParams(location.search).has("debug")) window.__hero = hero;
     qs(".hero").classList.add("is-gl");
     const cnt = qs(".hero-rail-count"); if (cnt) cnt.textContent = hero.particleCount.toLocaleString("en-US");
   } catch (err) {

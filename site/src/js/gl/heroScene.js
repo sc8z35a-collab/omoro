@@ -20,9 +20,9 @@ import { reduced } from "../core/env.js";
 const SIM_SIZE = { ultra: 512, high: 320, low: 144 }[quality.tier];
 const FLOOR_Y = -2.6;
 const SPOTS = [
-  { x: -5.4, color: "#b6a2ec", tilt: -.33, power: .8 },
-  { x: 0, color: "#d8ff4f", tilt: 0, power: 1.15 },
-  { x: 5.4, color: "#ff90b4", tilt: .33, power: .8 }
+  { x: -5.4, color: "#b6a2ec", tilt: -.33, power: .9 },
+  { x: 0, color: "#d8ff4f", tilt: 0, power: .75 },
+  { x: 5.4, color: "#ff90b4", tilt: .33, power: .9 }
 ];
 
 export class HeroScene {
@@ -207,7 +207,7 @@ export class HeroScene {
         transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.FrontSide,
         uniforms: {
           uNoise: { value: this.noise }, uApex: { value: apex }, uDir: { value: dir }, uColor: { value: color.clone().multiplyScalar(s.power) },
-          uTan: { value: tan }, uLength: { value: len }, uIntensity: { value: .085 }, uTime: { value: 0 }, uFloorY: { value: FLOOR_Y }, uSteps: { value: steps }, uGobo: { value: s.x === 0 ? .5 : .8 }
+          uTan: { value: tan }, uLength: { value: len }, uIntensity: { value: .05 }, uTime: { value: 0 }, uFloorY: { value: FLOOR_Y }, uSteps: { value: steps }, uGobo: { value: s.x === 0 ? .5 : .8 }
         }
       });
       const cone = new THREE.Mesh(geo, mat);
@@ -446,7 +446,10 @@ export class HeroScene {
     if (!this.visible || this.hidden) return;
     if (this.reduced && this.settle-- <= 0) return;
     this.timer.update();
-    const dt = Math.min(this.timer.getDelta(), 1 / 30);
+    // real elapsed time, simulated in ≤1/60 s substeps (max 4) so slow GPUs still converge on the glyphs
+    const raw = Math.min(this.timer.getDelta(), .25);
+    const sub = Math.max(1, Math.min(4, Math.ceil(raw / (1 / 60))));
+    const dt = raw / sub;
     const t = this.reduced ? 1 : this.timer.getElapsed();
     const u = this.simU;
     u.uTime.value = t; u.uDt.value = dt || 1 / 60;
@@ -456,7 +459,7 @@ export class HeroScene {
     if (this.mouseLocal.x < 50 && this.mousePrev.x < 50) this.mouseVel.lerp(this.mouseLocal.clone().sub(this.mousePrev).divideScalar(Math.max(dt, 1e-3)).clampLength(0, 6), .3);
     else this.mouseVel.multiplyScalar(.8);
     this.mousePrev.copy(this.mouseLocal);
-    this.gpu.compute();
+    for (let k = 0; k < sub; k++) { this.gpu.compute(); u.uShockT.value += k ? dt : 0; }
     this.pMat.uniforms.tPos.value = this.gpu.getCurrentRenderTarget(this.posVar).texture;
     this.pMat.uniforms.tVel.value = this.gpu.getCurrentRenderTarget(this.velVar).texture;
     this.pMat.uniforms.uTime.value = t;

@@ -74,3 +74,4 @@
 - コンソールに `[pageerror]` が出たら必ず直す。
 # TIPS appended below (by board.sh)
 - [2026-10-01 10:50:00Z] (A) HDRI(PolyHaven studio)を environment に入れると金属/ガラスが一気に「本物」になるが、暗い背景のサイトでは scene.environmentIntensity を .3〜.5 に。1.0 のままだと反射が bloom 閾値を超えて全体が白く霞む（fx テストで実測）。
+- [2026-10-01 11:02:54Z] (D) 流体シミュ(stable fluids)は three の WebGLRenderTarget(HalfFloat, Linear) を ping-pong するだけで書ける。OrthographicCamera+PlaneGeometry(2,2) の simScene を1つ持ち、material を差し替えて blit。dye の『高さ』から法線を作り、写真 UV を n.xy でずらし + reflect でスペキュラを足すと『濡れたインク』に見える。速度場で写真を引っ張るだけだと汚れて見えるので必ず法線ライティングを入れる

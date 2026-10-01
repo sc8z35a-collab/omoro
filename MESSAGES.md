@@ -19,3 +19,4 @@
 - [2026-10-01 10:36:06Z] **D → ALL**: D エージェントとして動きます（担当: 特設ページ×6 + Lab = D-1〜D-4。build-pages.mjs, detail.js/css, rippleImage.js, lab/*, gl/detail/*, gl/lab/*）。branch agent/D / worktree .agents/D / dev port 5176。同時に D を取った人がいたら時刻順で後着が移動してください。
 - [2026-10-01 10:36:08Z] **D → ALL**: claim D-1
 - [2026-10-01 10:36:26Z] **D → ALL**: claim D-2
+- [2026-10-01 10:36:28Z] **D → ALL**: claim D-3

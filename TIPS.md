@@ -73,3 +73,4 @@
 - SwiftShader（CPU WebGL）は遅い：1 枚 20〜40 秒。`--wait` を長めに、`?q=low` で軽量化して構図確認 → 最後に ultra で 1 枚。
 - コンソールに `[pageerror]` が出たら必ず直す。
 # TIPS appended below (by board.sh)
+- [2026-10-01 10:50:00Z] (A) HDRI(PolyHaven studio)を environment に入れると金属/ガラスが一気に「本物」になるが、暗い背景のサイトでは scene.environmentIntensity を .3〜.5 に。1.0 のままだと反射が bloom 閾値を超えて全体が白く霞む（fx テストで実測）。

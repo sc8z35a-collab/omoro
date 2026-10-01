@@ -95,13 +95,13 @@ function loadFrame() {
   }).catch(() => null);
   return framePromise;
 }
-function frameMaterial(aniso) {
-  return new THREE.MeshPhysicalMaterial({
+function frameMaterial(aniso, lite) {
+  return new (lite ? THREE.MeshStandardMaterial : THREE.MeshPhysicalMaterial)({
     map: tex("models/c-frame/textures/frame_diff.webp", { srgb: true, aniso }),
     normalMap: tex("models/c-frame/textures/frame_nor_gl.webp", { aniso }),
     roughnessMap: tex("models/c-frame/textures/frame_rough.webp", { aniso }),
     color: 0xfff1d6, metalness: 1, roughness: .85, normalScale: new THREE.Vector2(1.2, 1.2),
-    clearcoat: .35, clearcoatRoughness: .3, envMapIntensity: 1.1
+    ...(lite ? {} : { clearcoat: .35, clearcoatRoughness: .3 }), envMapIntensity: 1.1
   });
 }
 // procedural smudge / dust map for the glass roughness
@@ -142,7 +142,7 @@ function plaqueTexture(m) {
   return t;
 }
 
-export async function createFramedCard(renderer, m, i, { glass = true } = {}) {
+export async function createFramedCard(renderer, m, i, { glass = true, lite = false } = {}) {
   const aniso = renderer.capabilities.getMaxAnisotropy();
   const res = quality.tier === "low" ? 640 : 1440;
   const [layers, frameGeo] = await Promise.all([momentLayers(m, { width: res, height: Math.round(res / (SRC_W / SRC_H)) }), loadFrame()]);
@@ -171,7 +171,7 @@ export async function createFramedCard(renderer, m, i, { glass = true } = {}) {
   // gilded frame (or a procedural bevel if the model failed to load)
   let frame;
   if (frameGeo) {
-    frame = new THREE.Mesh(frameGeo, frameMaterial(aniso));
+    frame = new THREE.Mesh(frameGeo, frameMaterial(aniso, lite));
     frame.scale.set(SX, SY, SX * .8);
   } else {
     const shape = new THREE.Shape(); shape.moveTo(-FRAME_W / 2, -FRAME_H / 2); shape.lineTo(FRAME_W / 2, -FRAME_H / 2); shape.lineTo(FRAME_W / 2, FRAME_H / 2); shape.lineTo(-FRAME_W / 2, FRAME_H / 2);
@@ -200,12 +200,9 @@ export async function createFramedCard(renderer, m, i, { glass = true } = {}) {
 
   // brass plaque
   const pt = plaqueTexture(m);
-  const plaque = new THREE.Mesh(new THREE.BoxGeometry(1.7, .42, .05), [
-    new THREE.MeshStandardMaterial({ color: 0x9c7a3e, metalness: 1, roughness: .35 }), new THREE.MeshStandardMaterial({ color: 0x9c7a3e, metalness: 1, roughness: .35 }),
-    new THREE.MeshStandardMaterial({ color: 0x9c7a3e, metalness: 1, roughness: .35 }), new THREE.MeshStandardMaterial({ color: 0x9c7a3e, metalness: 1, roughness: .35 }),
-    new THREE.MeshPhysicalMaterial({ map: pt, metalnessMap: null, metalness: .85, roughness: .32, clearcoat: .6, clearcoatRoughness: .2 }),
-    new THREE.MeshStandardMaterial({ color: 0x2a2010 })
-  ]);
+  const edge = new THREE.MeshStandardMaterial({ color: 0x9c7a3e, metalness: 1, roughness: .35 });
+  const plaque = new THREE.Mesh(new THREE.BoxGeometry(1.7, .42, .05), [edge, edge, edge, edge,
+    new THREE.MeshStandardMaterial({ map: pt, metalness: .85, roughness: .3 }), edge]);
   plaque.position.set(0, -FRAME_H / 2 - .38, .05);
   plaque.castShadow = true;
   inner.add(plaque);

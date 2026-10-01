@@ -50,12 +50,13 @@ export class GalleryScene {
     const aniso = r.capabilities.getMaxAnisotropy();
     this.floor = createMarbleFloor(r, scene, { y: FLOOR_Y, res: quality.tier === "low" ? 512 : 2048, aniso, samples: quality.tier === "low" ? 0 : 4 });
     scene.add(this.floor.mesh);
-    this.curtain = createCurtain({ radius: 21, height: 18, y: FLOOR_Y, aniso });
+    this.curtain = createCurtain({ radius: 21, height: 18, y: FLOOR_Y, aniso, segments: quality.tier === "low" ? 360 : 960 });
     scene.add(this.curtain.mesh);
     this.lanterns = createLanterns({ count: quality.tier === "low" ? 42 : 96, radius: 17, rings: 3, y: 8.2 });
     scene.add(this.lanterns.group);
     // a few real point lights to carry the lantern glow onto the curtain + floor
-    this.lanternLights = [0, 1, 2, 3].map((k) => {
+    const LOW = quality.tier === "low";
+    this.lanternLights = (LOW ? [] : [0, 1, 2, 3]).map((k) => {
       const l = new THREE.PointLight(0xff7a40, 0, 22, 1.6);
       const a = k / 4 * TWO_PI + .4; l.position.set(Math.sin(a) * 15, 6.5, Math.cos(a) * 15);
       scene.add(l); return l;
@@ -82,7 +83,7 @@ export class GalleryScene {
     this.world.add(this.armillary, plinth);
 
     // cards
-    const built = await Promise.all(this.moments.map((m, i) => createFramedCard(r, m, i, { glass: true })));
+    const built = await Promise.all(this.moments.map((m, i) => createFramedCard(r, m, i, { glass: !LOW, lite: LOW })));
     built.forEach((c) => { this.world.add(c.holder); this.cards.push(c); });
     this.applyLayout("ring", { instant: true, keepFocus: false });
 

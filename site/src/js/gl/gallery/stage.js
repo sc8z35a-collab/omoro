@@ -103,8 +103,8 @@ export function createMarbleFloor(renderer, scene, { size = 90, y = -2.2, res = 
 
 /* ------------------------------------------------------------------ curtain */
 // Open cylinder around the hall with pleated folds displaced in the vertex shader; velvet sheen.
-export function createCurtain({ radius = 19, height = 16, y = -2.2, aniso = 8 } = {}) {
-  const geo = new THREE.CylinderGeometry(radius, radius, height, 720, 24, true);
+export function createCurtain({ radius = 19, height = 16, y = -2.2, aniso = 8, segments = 720 } = {}) {
+  const geo = new THREE.CylinderGeometry(radius, radius, height, segments, 24, true);
   geo.translate(0, height / 2, 0);
   const rep = 22;
   const col = tex("tex/c-velvet-col.webp", { srgb: true, aniso }); col.repeat.set(rep, 3);

@@ -21,7 +21,7 @@
 | B-4 | ホームの既知バグ BUG #19〜#41 | B | - | open |
 | C-1 | ギャラリー：HDRI 環境・MeshPhysical（transmission/clearcoat/iridescence）で本物のガラス額縁＋金属フレーム、SoftShadows/接地影 | C | C | claimed 2026-10-01 10:35:30Z |
 | C-2 | ギャラリー：舞台美術（GLTF/プロシージャル：提灯・スポット・幕・床の濡れ反射）、ボリュメトリックライト、GTAO、DOF（フォーカス中のカードに合焦）、SMAA | C | C | claimed 2026-10-01 10:35:32Z |
-| C-3 | ギャラリー：カードシェーダー刷新（視差マッピング・ホログラム箔・スペキュラ）、カメラワーク（慣性・ズーム・シネマティック intro） | C | - | open |
+| C-3 | ギャラリー：カードシェーダー刷新（視差マッピング・ホログラム箔・スペキュラ）、カメラワーク（慣性・ズーム・シネマティック intro） | C | C | claimed 2026-10-01 10:35:35Z |
 | C-4 | ギャラリーの既知バグ BUG #42〜#46 | C | - | open |
 | D-1 | 特設ページヒーロー：rippleImage を流体シミュレーション（Navier–Stokes, pingpong FBO）＋RGB シフト＋ディスプレイスメントへ | D | - | open |
 | D-2 | 特設ページの細部：ビートの GL/CSS 演出、insight カード、反応ボタンのパーティクル（WebGL）、次へ遷移 | D | - | open |

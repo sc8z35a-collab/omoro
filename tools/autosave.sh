@@ -45,6 +45,8 @@ cycle() {
   exec 9>"$LOCK"
   flock -n 9 || { log "skip: another cycle running"; return 0; }
   if busy; then log "skip: git operation in progress"; return 0; fi
+  # children (git, gh, ssh) must not inherit the lock fd
+  _run() { "$@" 9>&-; }
   local br; br="${AUTOSAVE_BRANCH:-$(git symbolic-ref --short -q HEAD)}"
   if [ -z "$br" ] || [ "$br" = "main" ] || [ "$br" = "master" ]; then log "skip: branch '$br' not allowed"; return 0; fi
 
@@ -62,16 +64,16 @@ cycle() {
     ahead="$(git rev-list --count "origin/$br..HEAD" 2>/dev/null || echo 1)"
   fi
   if [ "$ahead" != "0" ]; then
-    if timeout 90 git -c core.hooksPath=/dev/null push -q origin "HEAD:refs/heads/$br" >/dev/null 2>&1; then
+    if _run timeout 90 git -c core.hooksPath=/dev/null push -q origin "HEAD:refs/heads/$br" >/dev/null 2>&1; then
       log "push ok: $br (+$ahead)"
     else
       log "push rejected -> pull --rebase"
-      if timeout 90 git -c core.hooksPath=/dev/null pull -q --rebase --autostash origin "$br" >/dev/null 2>&1 \
-         && timeout 90 git -c core.hooksPath=/dev/null push -q origin "HEAD:refs/heads/$br" >/dev/null 2>&1; then
+      if _run timeout 90 git -c core.hooksPath=/dev/null pull -q --rebase --autostash origin "$br" >/dev/null 2>&1 \
+         && _run timeout 90 git -c core.hooksPath=/dev/null push -q origin "HEAD:refs/heads/$br" >/dev/null 2>&1; then
         log "push ok after rebase: $br"
       else
         git rebase --abort >/dev/null 2>&1
-        timeout 90 git -c core.hooksPath=/dev/null push -q -f origin "HEAD:refs/heads/autosave/$br" >/dev/null 2>&1 \
+        _run timeout 90 git -c core.hooksPath=/dev/null push -q -f origin "HEAD:refs/heads/autosave/$br" >/dev/null 2>&1 \
           && log "BACKUP pushed to autosave/$br (resolve manually!)" || log "ERROR: backup push failed"
       fi
     fi
@@ -79,9 +81,10 @@ cycle() {
 
   # make sure there is a PR so the work is visible
   if [ -z "${AUTOSAVE_NO_PR:-}" ] && command -v gh >/dev/null; then
-    if ! timeout 30 gh pr view "$br" --json number >/dev/null 2>&1; then
+    local open; open="$(_run timeout 30 gh pr list --head "$br" --state open --json number -q 'length' 2>/dev/null || echo err)"
+    if [ "$open" = "0" ]; then
       local base="genspark_ai_developer"; [ "$br" = "genspark_ai_developer" ] && base="main"
-      timeout 40 gh pr create --draft --base "$base" --head "$br" \
+      _run timeout 40 gh pr create --draft --base "$base" --head "$br" \
         --title "WIP(autosave): $br" --body "Auto-created by tools/autosave.sh. Work in progress; squashed before merge." >/dev/null 2>&1 \
         && log "draft PR created: $br -> $base"
     fi
@@ -93,9 +96,9 @@ loop() {
   trap 'log "daemon stop (pid $$)"; rm -f "$PIDF"; exit 0' TERM INT
   log "daemon start (pid $$, every ${INTERVAL}s, repo $REPO)"
   while true; do
-    sleep "$INTERVAL" &
+    sleep "$INTERVAL" 9>&- &
     wait $!
-    cycle
+    ( cycle )   # subshell => flock released after each cycle
   done
 }
 
@@ -109,7 +112,7 @@ case "${1:-status}" in
   __loop) echo $$ > "$PIDF"; loop ;;
   stop) if running; then kill "$(cat "$PIDF")" && echo "stopped"; else echo "not running"; fi; rm -f "$PIDF" ;;
   status) if running; then echo "running (pid $(cat "$PIDF"))"; else echo "NOT running"; fi; tail -n 5 "$LOG" 2>/dev/null ;;
-  once) cycle; tail -n 5 "$LOG" ;;
+  once) ( cycle ); tail -n 5 "$LOG" ;;
   log) tail -n "${2:-40}" "$LOG" ;;
   *) echo "usage: $0 start|ensure|stop|status|once|log"; exit 2 ;;
 esac

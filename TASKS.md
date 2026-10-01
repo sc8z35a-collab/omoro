@@ -13,7 +13,7 @@
 | A-3 | 共通 GL 基盤 `site/src/js/gl/fx/`（renderer/HDRI/composer/UltraFinalPass/quality） | A | A | done 2026-10-01 10:50:12Z |
 | A-4 | 共通 chrome の超高品質化：WebGL カーソル残像 or 流体、ページ遷移を GL シェーダーに、ローダー刷新、grain を GL ノイズに | A | - | open |
 | A-5 | 共通 UI バグ修正 BUG #1〜#18, #64, #65（chrome.js / base.css / partials） | A | A | claimed 2026-10-01 10:50:14Z |
-| A-6 | credits 更新・README・統合・publish・最終 PR | A | - | open |
+| A-6 | credits 更新・README・統合・publish・最終 PR | A | C2 | claimed 2026-10-01 12:33:23Z |
 | A-7 | 全エージェントの環境エラー集 `docs/DEV_ENV_ERRORS.md` ＋ 次のエージェントへの技術アドバイス `docs/NEXT_AGENT_GUIDE.md` | A | - | open |
 | B-1 | ヒーロー：GPGPU パーティクル（GPUComputationRenderer, 100k〜260k 粒）＋カールノイズ流体、文字モーフ | B | B | claimed 2026-10-01 10:35:23Z |
 | B-2 | ヒーロー：ボリュメトリック・スポットライト（レイマーチ or 多層コーン）＋ゴッドレイ、HDRI 反射床（MeshReflector/SSR風）、DOF、色収差 | B | B | claimed 2026-10-01 10:35:39Z |

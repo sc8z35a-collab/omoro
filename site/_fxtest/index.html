@@ -1,10 +1,10 @@
 <!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;height:100%;background:#000}canvas{width:100%;height:100%;display:block}</style>
 <script type="module">
 import * as THREE from "three";
-import { createRenderer, loadEnv, makeComposer, quality, hot } from "/src/js/gl/fx/index.js";
+import { createRenderer, applyEnv, makeComposer, quality, hot } from "/src/js/gl/fx/index.js";
 const c = document.querySelector("canvas");
 const r = createRenderer(c); const s = new THREE.Scene(); const cam = new THREE.PerspectiveCamera(40, innerWidth/innerHeight, .1, 100); cam.position.set(0,1,6); cam.lookAt(0,0,0);
-s.environment = await loadEnv(r, "studio"); s.background = new THREE.Color(0x0b0c0d);
+await applyEnv(s, r, "studio", { intensity: .4 }); s.background = new THREE.Color(0x0b0c0d);
 const m = new THREE.Mesh(new THREE.TorusKnotGeometry(1,.35,128,24), new THREE.MeshPhysicalMaterial({ color:0xffffff, metalness:1, roughness:.15, iridescence:1, clearcoat:1 }));
 s.add(m); const e = new THREE.Mesh(new THREE.SphereGeometry(.3), new THREE.MeshBasicMaterial({ color:hot("#d8ff4f",4) })); e.position.set(-2,1,-1); s.add(e);
 const fx = makeComposer(r, s, cam, { gtao:true, dof:{focus:6} }); r.setSize(innerWidth, innerHeight, false); fx.setSize(innerWidth, innerHeight);

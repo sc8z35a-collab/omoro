@@ -51,7 +51,9 @@ const HDRI = {
   night: "hdr/moonless_golf_1k.hdr"       // very dark sky — subtle rim light for night scenes
 };
 const envCache = new Map();
-export function loadEnv(renderer, key = "studio", { intensity } = {}) {
+// NOTE: Poly Haven studio HDRIs have softboxes at 10–50 in linear HDR. On this dark site use
+//       scene.environmentIntensity ≈ .25–.6 (see applyEnv) or bloom will flood the frame.
+export function loadEnv(renderer, key = "studio") {
   const id = key + ":" + renderer.id;
   if (envCache.has(id)) return envCache.get(id);
   const pmrem = new THREE.PMREMGenerator(renderer);
@@ -70,6 +72,15 @@ export function loadEnv(renderer, key = "studio", { intensity } = {}) {
   });
   envCache.set(id, p);
   return p;
+}
+
+// Convenience: load + assign to a scene with a sane intensity for dark scenes. Returns the env texture.
+export async function applyEnv(scene, renderer, key = "studio", { intensity = .4, background = false, blur = .6, bgIntensity = .15 } = {}) {
+  const env = await loadEnv(renderer, key);
+  scene.environment = env;
+  scene.environmentIntensity = intensity;
+  if (background) { scene.background = env; scene.backgroundBlurriness = blur; scene.backgroundIntensity = bgIntensity; }
+  return env;
 }
 
 /* ---------------- post-processing chain ---------------- */
@@ -93,7 +104,7 @@ export function makeComposer(renderer, scene, camera, opts = {}) {
     composer.addPass(passes.dof);
   }
   if (bloom !== false) {
-    passes.bloom = new UnrealBloomPass(new THREE.Vector2(size.x, size.y), bloom.strength ?? .8, bloom.radius ?? .6, bloom.threshold ?? .82);
+    passes.bloom = new UnrealBloomPass(new THREE.Vector2(size.x, size.y), bloom.strength ?? .55, bloom.radius ?? .5, bloom.threshold ?? .9);
     composer.addPass(passes.bloom);
   }
   passes.final = new ShaderPass(UltraFinalShader);

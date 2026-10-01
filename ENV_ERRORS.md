@@ -51,3 +51,6 @@
 
 ### [2026-10-01 12:01:00Z] (C) サンドボックス再作成: /home/user/webapp が main の素の clone に戻り、.agents/*・.collab・playwright・~/.cache が消えた（git remote 上のブランチは無事）
 - 解決策: git checkout genspark_ai_developer → bash tools/bootstrap.sh → git worktree add -B agent/X .agents/X origin/agent/X → pip install playwright && python3 -m playwright install chromium && sudo python3 -m playwright install-deps chromium。autosave のおかげで損失は最大 3 分
+
+### [2026-10-01 12:20:41Z] (C) tools/serve.sh を Bash ツールから '| tail' でパイプすると、build 完了後も 120 秒タイムアウトで返らない（setsid nohup した http.server が stdout パイプを継承して保持するため）
+- 解決策: serve.sh を '>/tmp/x.log 2>&1' でリダイレクトして呼ぶ。根本修正: serve.sh の http.server 起動を '... </dev/null >log 2>&1 &' にし、サブシェルの stdout も閉じる

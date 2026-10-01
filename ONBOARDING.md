@@ -4,24 +4,28 @@
 **開発者から「全ツール・ハーネス・便利機能の自由な共有と使用」「細部作成のためのあらゆる手段の行使」が明示的に許可されています**（README.md 参照）。
 
 ## 1. セットアップ（コピペで OK）
-```bash
-cd /home/user/webapp
-git fetch origin --prune
-# collab ハブを読む（.collab は git worktree。無ければ board.sh が自動作成）
-bash tools/bootstrap.sh            # hooksPath 設定・npm install・autosave 起動（冪等）
-tools/board.sh read                # 掲示板・タスク・全員の status を表示
 
-# 自分専用の作業ツリーを作る（X = B / C / D）。webapp 本体は A が使っているので触らない
-X=B
-git worktree add -B agent/$X .agents/$X origin/genspark_ai_developer
-cd .agents/$X
-ln -s ../../node_modules node_modules       # 依存を共有（npm install 不要）
-bash tools/bootstrap.sh                      # このツリー用の autosave も起動（3分ごと agent/$X を push、draft PR 自動作成）
+### ケース①：別サンドボックス（自分専用の /home/user/webapp がある・普通はこちら）
+```bash
+X=B                                   # 自分の担当 B / C / D
+cd /home/user/webapp 2>/dev/null || { git clone https://github.com/sc8z35a-collab/omoro.git /home/user/webapp && cd /home/user/webapp; }
+# GitHub 認証が無ければ setup_github_environment ツールを先に実行
+git fetch origin --prune
+git checkout -B agent/$X origin/agent/$X 2>/dev/null || git checkout -B agent/$X origin/genspark_ai_developer
+bash tools/bootstrap.sh               # hooksPath・npm install・autosave 起動（冪等）→ 3分ごとに agent/$X を push、draft PR 自動作成
+tools/board.sh read                   # 掲示板（collab ブランチ）を .collab/ に自動 checkout して表示
 tools/board.sh status $X "onboarded, reading code"
 tools/board.sh claim $X $X-1
 ```
-> `tools/board.sh` はどの worktree から実行しても **メインツリー直下の `/home/user/webapp/.collab`**（共有 worktree）を使い、
-> flock で排他します。直接ファイルを編集したい場合も `.collab/` を編集 → `tools/board.sh push "msg"`。
+
+### ケース②：A と同じサンドボックスを共有している場合
+```bash
+X=B; cd /home/user/webapp
+git worktree add -B agent/$X .agents/$X origin/genspark_ai_developer
+cd .agents/$X && ln -s ../../node_modules node_modules && bash tools/bootstrap.sh
+```
+> どの worktree から `tools/board.sh` を実行しても、メインツリー直下の `.collab/`（共有 worktree）を flock 付きで使います。
+> 直接編集したい場合は `.collab/` を編集 → `tools/board.sh push "msg"`。
 
 ## 2. 開発サーバー（ポートは担当ごとに固定・衝突防止）
 | 担当 | dev (vite) | preview (build 確認) |

@@ -33,7 +33,7 @@ export class GalleryScene {
     this.pointer = new THREE.Vector2(9, 9); this.pSmooth = new THREE.Vector2();
     this.hovered = -1; this.focused = -1;
     this.drag = { on: false, x: 0, y: 0, moved: 0, vx: 0 };
-    this.intro = { v: 0 };
+    this.intro = { v: 0 }; this.house = 0;
     this.cards = [];
     this.ready = this.init().catch((e) => { console.error("[gallery]", e); throw e; });
   }
@@ -240,7 +240,7 @@ export class GalleryScene {
       color: 0xffffff, map: this.tx("tex/c-marble-col.webp", { srgb: true, repeat: rep }),
       normalMap: this.tx("tex/c-marble-nor.webp", { repeat: rep }), normalScale: new THREE.Vector2(.55, .55),
       roughnessMap: this.tx("tex/c-marble-rough.webp", { repeat: rep }),
-      roughness: .5, metalness: 0, clearcoat: 1, clearcoatRoughness: .06, envMapIntensity: .5
+      roughness: .5, metalness: 0, clearcoat: 1, clearcoatRoughness: .06, envMapIntensity: .22
     });
     mat.onBeforeCompile = (sh) => {
       sh.uniforms.tReflect = { value: rt.texture };
@@ -269,7 +269,7 @@ export class GalleryScene {
             refl /= wsum;
             vec3 Vw = normalize(cameraPosition - vWorldP);
             float fres = .04 + .96 * pow(1. - clamp(Vw.y, 0., 1.), 5.);
-            float k = mix(.32, 1., fres) * (1. - rr * .55);
+            float k = mix(.07, .85, fres) * (1. - rr * .6);
             // fade reflection with distance from the hall centre so the edge of the world never shows
             float fade = smoothstep(40., 14., length(vWorldP.xz));
             outgoingLight += refl * k * fade;
@@ -279,6 +279,16 @@ export class GalleryScene {
     const floor = new THREE.Mesh(new THREE.PlaneGeometry(size, size), mat);
     floor.rotation.x = -Math.PI / 2; floor.position.y = FLOOR_Y; floor.receiveShadow = true;
     this.stage.add(floor);
+    // the floor samples the reflection RT, so it must not be drawn *into* it (GL feedback loop)
+    const hideDuringReflection = [floor];
+    this.reflHide = hideDuringReflection;
+    const orig = refl.onBeforeRender;
+    refl.onBeforeRender = (renderer, scene, camera) => {
+      if (camera.isReflectionCamera || camera.userData.isReflection) return;
+      hideDuringReflection.forEach((o) => { o.visible = false; });
+      orig.call(refl, renderer, scene, camera);
+      hideDuringReflection.forEach((o) => { o.visible = true; });
+    };
 
     // inlaid brass ring + compass rose around the centre (reads as a museum rotunda)
     const ringMat = new THREE.MeshPhysicalMaterial({ color: 0xc9a25a, metalness: 1, roughness: .22, clearcoat: .8 });

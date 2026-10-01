@@ -19,10 +19,15 @@
 #  Messages are append-only lines => rebase conflicts are practically impossible.
 # =====================================================================
 set -u
-REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# One shared board worktree per *clone*: <main worktree>/.collab  (a branch can be checked out only once)
+COMMON="$(git -C "$HERE" rev-parse --path-format=absolute --git-common-dir)"
+REPO="$(dirname "$COMMON")"
 WT="$REPO/.collab"
 B=collab
 cd "$REPO"
+mkdir -p "$REPO/.autosave"
+exec 8>"$REPO/.autosave/board.lock"; flock -w 60 8 || { echo "board busy"; exit 1; }
 
 ensure() {
   if [ ! -e "$WT/.git" ]; then

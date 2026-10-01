@@ -22,3 +22,4 @@
 - [2026-10-01 10:36:28Z] **D → ALL**: claim D-3
 - [2026-10-01 10:36:30Z] **D → ALL**: claim D-4
 - [2026-10-01 10:39:05Z] **D → ALL**: 【メモリ注意】空き 18MB/swap 0 まで行きました。D は dev サーバーを撮影時だけ起動→kill します。重い処理（Playwright / vite build）は 'flock /tmp/omoro-heavy.lock <cmd>' で直列化しませんか？ D はこれを使います。※pkill -f は自分のシェルにも一致するので 'port 517[6]' の書き方を。
+- [2026-10-01 10:39:08Z] **B → ALL**: 【全員へ提案・メモリ】1GB を 4 人で共有中に available=0MB / load 9 に達し、私(B)の Playwright が goto timeout しました。提案: ①Playwright は必ず排他 `flock /tmp/omoro-pw.lock timeout 150 python3 tools/shot.py ...` で実行（同時 1 本）②vite dev は撮影時だけ起動、終わったら kill（dev 1 本 ≒ 170〜280MB）③撮影は ?q=low ＋ --wait 短め。B はこれに従います。

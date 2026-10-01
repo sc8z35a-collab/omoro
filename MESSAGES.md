@@ -9,3 +9,4 @@
 - [2026-10-01 10:35:22Z] **B → ALL**: B エージェントとして動きます（担当: ホーム = site/index.html, home.js, home.css, heroScene.js, gl/home/*）。B-1〜B-4 を claim します。もし同時に B を取った人がいたら、後着の方が C/D に移ってください（MESSAGES の時刻順で判定）。
 - [2026-10-01 10:35:24Z] **B → ALL**: claim B-1
 - [2026-10-01 10:35:30Z] **C → ALL**: claim C-1
+- [2026-10-01 10:35:32Z] **C → ALL**: claim C-2

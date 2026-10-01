@@ -13,35 +13,45 @@ let hero = null;
 const heroCanvas = qs(".hero-canvas");
 const heroNow = qs(".hero-now");
 const chips = qs(".hero-switch");
-moments.forEach((m, i) => chips.append(h("button", { type: "button", class: "hero-chip", "data-morph": i, "aria-pressed": "false", "--chip": m.accent }, m.number + " " + m.title)));
-if (isMobile()) qsa(".hero-chip", chips).forEach((c, i) => { if (i) c.textContent = moments[i - 1].number; });
+const noGL = !webglOK() || new URLSearchParams(location.search).has("nogl");
+moments.forEach((m, i) => chips.append(h("button", { type: "button", class: "hero-chip", "data-morph": i, "aria-pressed": "false", "--chip": m.accent, "aria-label": `${m.number} ${m.title}` }, h("span", { class: "chip-num" }, m.number), h("span", { class: "chip-name" }, m.title))));
 
 function setChip(key) {
   qsa(".hero-chip", chips).forEach((c) => { const on = c.dataset.morph === String(key); c.classList.toggle("is-active", on); c.setAttribute("aria-pressed", String(on)); });
   heroNow.textContent = "NOW: " + (key === "intro" ? "面白いねえ。" : moments[key].title);
+  const accent = key === "intro" ? "#d8ff4f" : moments[key].accent;
+  qs(".hero").style.setProperty("--hero-accent", accent);
 }
-let autoTimer = null, autoIndex = -1;
+let autoTimer = null, autoIndex = -1, resumeTimer = null;
 function stopAuto() { clearInterval(autoTimer); autoTimer = null; }
 function startAuto() {
   stopAuto();
   if (reduced) return;
-  autoTimer = setInterval(() => { autoIndex = (autoIndex + 1) % moments.length; hero?.show(autoIndex); setChip(autoIndex); }, 5200);
+  autoTimer = setInterval(() => { autoIndex = (autoIndex + 1) % moments.length; hero?.show(autoIndex); setChip(autoIndex); }, 6400);
 }
 chips.addEventListener("click", (e) => {
   const b = e.target.closest(".hero-chip");
   if (!b || !hero) return;
-  stopAuto();
+  stopAuto(); clearTimeout(resumeTimer);
   const key = b.dataset.morph;
   if (key === "intro") hero.showIntro(); else { autoIndex = Number(key); hero.show(autoIndex); }
   setChip(key);
-  setTimeout(startAuto, 12000);
+  resumeTimer = setTimeout(startAuto, 12000);
 });
 
 async function bootHero() {
-  if (!webglOK() || new URLSearchParams(location.search).has("nogl")) { heroCanvas.remove(); chips.hidden = true; return; }
-  const { HeroScene } = await import("../gl/heroScene.js");
-  hero = new HeroScene(heroCanvas, moments);
-  setTimeout(startAuto, 6000);
+  if (noGL) { heroCanvas.remove(); chips.hidden = true; qs(".hero").classList.add("is-nogl"); return; }
+  try {
+    const { HeroScene } = await import("../gl/heroScene.js");
+    hero = new HeroScene(heroCanvas, moments);
+    await hero.ready;
+    qs(".hero").classList.add("is-gl");
+  } catch (err) {
+    console.error("[hero] WebGL init failed, falling back", err);
+    hero = null; heroCanvas.remove(); chips.hidden = true; qs(".hero").classList.add("is-nogl");
+    return;
+  }
+  setTimeout(startAuto, 7000);
   ScrollTrigger.create({ trigger: ".hero", start: "top top", end: "bottom top", scrub: true, onUpdate: (st) => hero.setScroll(st.progress) });
 }
 bootHero();

@@ -1,6 +1,6 @@
 import "../../css/base.css";
 import "../../css/lab.css";
-import { initChrome, gsap, toast, magnetic, splitChars } from "../core/chrome.js";
+import { initChrome, gsap, toast, magnetic, splitChars, lenis } from "../core/chrome.js";
 import { moments, momentUrl, img, speakerOf } from "../core/data.js";
 import { store } from "../core/store.js";
 import { reduced, coarse, qs, qsa, h } from "../core/env.js";
@@ -21,15 +21,21 @@ const names = ["reel", "quiz", "card", "distance", "ma", "temp"];
 const tabs = names.map((n) => qs("#tab-" + n)), panels = names.map((n) => qs("#" + n)), ink = qs(".lab-tabs-ink");
 const hooks = {};
 function moveInk() { const t = tabs.find((x) => x.getAttribute("aria-selected") === "true"); if (!t) return; ink.style.left = t.offsetLeft + "px"; ink.style.width = t.offsetWidth + "px"; }
+let booted = false;
 function activate(name, focus = false, scroll = false) {
   const active = names.includes(name) ? name : "reel";
   tabs.forEach((t, i) => { const on = names[i] === active; t.setAttribute("aria-selected", String(on)); t.tabIndex = on ? 0 : -1; panels[i].hidden = !on; if (on && focus) t.focus(); });
   moveInk();
   Object.entries(hooks).forEach(([k, fn]) => fn?.(k === active));
-  history.replaceState(null, "", location.pathname + location.search + "#" + active);
+  if (booted && location.hash.slice(1) !== active) history.replaceState(null, "", location.pathname + location.search + "#" + active);
   const panel = qs("#" + active);
   if (!reduced) gsap.from(panel.querySelectorAll(".panel-side > *, .panel-grid > :last-child"), { opacity: 0, y: 30, duration: .8, stagger: .04, ease: "expo.out" });
-  if (scroll) qs(".lab-tabs").scrollIntoView({ behavior: reduced ? "auto" : "smooth" });
+  if (scroll) scrollToTabs();
+  booted = true;
+}
+function scrollToTabs() {
+  const y = qs(".lab-tabs").getBoundingClientRect().top + scrollY - 0;
+  lenis ? lenis.scrollTo(y, { duration: 1.2 }) : scrollTo({ top: y, behavior: reduced ? "auto" : "smooth" });
 }
 tabs.forEach((t, i) => {
   t.addEventListener("click", () => activate(names[i]));
@@ -70,10 +76,11 @@ qs("#reel-prev").addEventListener("click", () => showReel(reelIndex - 1, -1));
 qs("#reel-next").addEventListener("click", () => showReel(reelIndex + 1, 1));
 reelPlay.addEventListener("click", () => (reelTimer ? stopReel() : startReel()));
 reelSpeed.addEventListener("change", () => { if (reelTimer) startReel(); });
-let sx = null;
-deck.addEventListener("pointerdown", (e) => { sx = e.clientX; });
-deck.addEventListener("pointerup", (e) => { if (sx == null) return; const dx = e.clientX - sx; sx = null; if (Math.abs(dx) > 40) { e.preventDefault(); showReel(reelIndex + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1); } });
-deck.addEventListener("click", (e) => { if (e.detail === 0) return; });
+let sx = null, swiped = false;
+deck.addEventListener("pointerdown", (e) => { sx = e.clientX; swiped = false; });
+deck.addEventListener("pointerup", (e) => { if (sx == null) return; const dx = e.clientX - sx; sx = null; if (Math.abs(dx) > 40) { swiped = true; showReel(reelIndex + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1); } });
+// BUG #63: a swipe ends with a click on the card link — cancel that navigation (keyboard clicks have detail 0 and pass)
+deck.addEventListener("click", (e) => { if (swiped && e.detail !== 0) { e.preventDefault(); e.stopPropagation(); swiped = false; } }, true);
 hooks.reel = (on) => { if (!on) stopReel(); };
 document.addEventListener("visibilitychange", () => { if (document.hidden) stopReel(); });
 addEventListener("keydown", (e) => { if (typing() || panels[0].hidden) return; if (e.key === "ArrowRight") showReel(reelIndex + 1, 1); if (e.key === "ArrowLeft") showReel(reelIndex - 1, -1); });
@@ -90,6 +97,7 @@ function renderQuestion() {
   const m = order[qi]; answered = false;
   Q.number.textContent = String(qi + 1).padStart(2, "0");
   Q.quote.textContent = m.title;
+  delete Q.quote.dataset.split; Q.quote.setAttribute("aria-label", m.title);   // BUG #53 #54
   Q.feedback.replaceChildren();
   Q.next.disabled = true;
   Q.next.textContent = qi === order.length - 1 ? "結果を見る →" : "次の問題 →";
@@ -102,9 +110,10 @@ function renderQuestion() {
 }
 function answer(sel) {
   if (answered || finished) return;
-  answered = true; timerTween?.kill();
+  answered = true;
+  const tweenTime = timerTween?.time?.() ?? 0; timerTween?.pause();
   const m = order[qi], correct = speakerOf(m), ok = sel === correct;
-  const elapsed = (performance.now() - qStart) / 1000;
+  const elapsed = Q.timed.checked ? tweenTime : (performance.now() - qStart) / 1000;   // BUG #56: tween pauses while hidden
   const gain = ok ? (Q.timed.checked ? Math.max(1, Math.round(10 - elapsed)) * 10 : 1) : 0;
   score += gain; results[qi] = ok;
   Q.score.textContent = score;
@@ -116,11 +125,12 @@ function answer(sel) {
 function finish() {
   finished = true;
   const correct = results.filter(Boolean).length;
-  Q.quote.textContent = `${correct} / 6 正解`;
+  Q.quote.textContent = `${correct} / 6 正解`; delete Q.quote.dataset.split; Q.quote.setAttribute("aria-label", Q.quote.textContent);
   Q.options.replaceChildren();
-  const best = Math.max(score, store.pref("quizBest", 0));
+  const prevBest = store.pref("quizBest", 0), isNewBest = score > prevBest;   // BUG #55: a tie is not a new best
+  const best = Math.max(score, prevBest);
   store.setPref("quizBest", best); Q.best.textContent = best;
-  Q.feedback.replaceChildren(h("strong", {}, correct === 6 ? "全問正解。あの間まで覚えている？" : correct >= 4 ? "かなりの通。" : "もう一回で、もっと覚えてしまうかも。"), h("span", {}, `SCORE ${score}${score >= best ? " — ベスト更新！" : ""}`));
+  Q.feedback.replaceChildren(h("strong", {}, correct === 6 ? "全問正解。あの間まで覚えている？" : correct >= 4 ? "かなりの通。" : "もう一回で、もっと覚えてしまうかも。"), h("span", {}, `SCORE ${score}${isNewBest ? " — ベスト更新！" : ""}`));
   if (correct === 6 && !reduced) confetti(Q.quote, 80);
   Q.next.disabled = false; Q.next.textContent = "もう一度遊ぶ ↗";
 }
@@ -175,7 +185,7 @@ async function drawCard() {
     const g = ctx.createLinearGradient(0, 0, W, H);
     ["#d8ff4f", "#b6a2ec", "#ff90b4", "#9fc4ff", "#ffd979"].forEach((col, i, a) => g.addColorStop(i / (a.length - 1), col));
     ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-    ctx.globalAlpha = .25; for (let i = -H; i < W; i += 40 * s) { ctx.fillStyle = i % (80 * s) ? "#fff" : "#000"; ctx.fillRect(i, 0, 8 * s, H * 2); } ctx.globalAlpha = 1;
+    ctx.globalAlpha = .25; for (let k = 0, i = -H; i < W; i += 40 * s, k++) { ctx.fillStyle = k % 2 ? "#fff" : "#000"; ctx.fillRect(i, 0, 8 * s, H * 2); }   // BUG #60 ctx.globalAlpha = 1;
   }
   const accentFill = theme === "night" || theme === "photo" ? m.accent : c.fg;
   ctx.fillStyle = accentFill; ctx.fillRect(M, M, 60 * s, 8 * s);
@@ -304,7 +314,7 @@ drawCard();
     const t = (performance.now() - start) / 1000;
     time.textContent = t.toFixed(2) + "s";
     prog.style.strokeDasharray = `${Math.min(t / full, 1) * C} ${C}`;
-    if (t > full) { finish(t); return; }
+    if (t > full) { finish(t, true); return; }
     raf = requestAnimationFrame(loop);
   }
   function begin() {
@@ -314,15 +324,18 @@ drawCard();
     btn.textContent = "ｵﾏﾂﾘｵﾄｺｶ…（今！）";
     raf = requestAnimationFrame(loop);
   }
-  function finish(t) {
+  function finish(t, timedOut = false) {
     cancelAnimationFrame(raf); phase = "done";
     const diff = Math.abs(t - target), [label, color] = grade(diff);
     line.textContent = "ｵﾏﾂﾘｵﾄｺｶ…"; line.style.fontSize = "1.6rem";
     state.textContent = label; state.style.color = color;
     time.textContent = t.toFixed(3) + "s";
     result.textContent = `${label}！ 目標 ${target}s との差 ${diff.toFixed(3)}s`;
+    if (timedOut) {   // BUG #58: not pressing is not an attempt
+      state.textContent = "TIME OVER"; result.textContent = "押さなかった…。間を置きすぎ。"; renderBest(); btn.textContent = "▶ もう一回"; return;
+    }
     history.push({ t, label }); history = history.slice(-20); store.setPref("maHistory", history);
-    const b = store.pref("maBest", null); if (b == null || diff < b) { store.setPref("maBest", diff); if (b != null) toast("ベスト更新！"); }
+    const b = store.pref("maBest", null); if (b == null || diff < b) { store.setPref("maBest", diff); toast(b == null ? "初記録！ ベストに登録しました" : "ベスト更新！"); }   // BUG #59
     renderBest();
     btn.textContent = "▶ もう一回";
   }
@@ -331,7 +344,9 @@ drawCard();
     else { line.style.fontSize = ""; state.style.color = ""; begin(); }
   }
   btn.addEventListener("click", press);
-  addEventListener("keydown", (e) => { if (e.code === "Space" && !panels[4].hidden && !typing()) { e.preventDefault(); if (document.activeElement !== btn) press(); } });
+  // BUG #57: Space always plays (prevent the native button click so it does not fire twice)
+addEventListener("keydown", (e) => { if (e.code === "Space" && !panels[4].hidden && !typing() && !e.repeat) { e.preventDefault(); press(); } });
+btn.addEventListener("keydown", (e) => { if (e.code === "Space") e.preventDefault(); });
   hooks.ma = (on) => { if (!on && phase === "run") { cancelAnimationFrame(raf); phase = "ready"; btn.textContent = "▶ スタート"; state.textContent = "READY"; } };
   qs("#ma-target").textContent = target;
   renderBest();
@@ -348,8 +363,11 @@ drawCard();
   const toHalf = (s) => Array.from(toKata(readings(s))).map((c) => map[c] || c).join("");
   function render() {
     const raw = input.value.trim() || "お祭り男";
-    const base = raw.replace(/[！!。…ォォ]+$/u, "");
-    loud.textContent = base + "ォ！";
+    const base = raw.replace(/[！!。…ォ〜ー]+$/u, "");
+    // BUG #61: stretch the last vowel only when it reads as one (ending in o-row kana); otherwise just shout
+    const last = toKata(readings(base)).slice(-1);
+    const oRow = /[オコソトノホモヨロヲゴゾドボポョォ]/u.test(last);
+    loud.textContent = base + (oRow ? "ォ！" : last && /[\u30A0-\u30FF\u3040-\u309F]/u.test(last) ? "ー！" : "！");
     quiet.textContent = toHalf(base) + "ｶ…";
     if (!reduced) { gsap.fromTo(loud, { scale: 1.08 }, { scale: 1, duration: .6, ease: "elastic.out(1,.4)" }); gsap.fromTo(quiet, { opacity: 0, x: 20 }, { opacity: .85, x: 0, duration: 1.2, delay: .5, ease: "expo.out" }); }
   }

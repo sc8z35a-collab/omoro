@@ -12,7 +12,7 @@
 | A-2 | 共有ネットワーク（collab ブランチ・board.sh・各種 md）構築 | A | A | done 2026-10-01 10:40:17Z |
 | A-3 | 共通 GL 基盤 `site/src/js/gl/fx/`（renderer/HDRI/composer/UltraFinalPass/quality） | A | A | done 2026-10-01 10:50:12Z |
 | A-4 | 共通 chrome の超高品質化：WebGL カーソル残像 or 流体、ページ遷移を GL シェーダーに、ローダー刷新、grain を GL ノイズに | A | - | open |
-| A-5 | 共通 UI バグ修正 BUG #1〜#18, #64, #65（chrome.js / base.css / partials） | A | - | open |
+| A-5 | 共通 UI バグ修正 BUG #1〜#18, #64, #65（chrome.js / base.css / partials） | A | A | claimed 2026-10-01 10:50:14Z |
 | A-6 | credits 更新・README・統合・publish・最終 PR | A | - | open |
 | A-7 | 全エージェントの環境エラー集 `docs/DEV_ENV_ERRORS.md` ＋ 次のエージェントへの技術アドバイス `docs/NEXT_AGENT_GUIDE.md` | A | - | open |
 | B-1 | ヒーロー：GPGPU パーティクル（GPUComputationRenderer, 100k〜260k 粒）＋カールノイズ流体、文字モーフ | B | B | claimed 2026-10-01 10:35:23Z |

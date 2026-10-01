@@ -10,8 +10,14 @@ usage:
     use it only for *relative* comparisons)
 Then look at the PNG with the Read tool (it renders images).
 """
-import asyncio, sys, argparse, os, re, time
+import asyncio, sys, argparse, os, re, time, fcntl
 from playwright.async_api import async_playwright
+
+# Global heavy-process lock shared by ALL agents (Playwright / vite build): only one at a time on 1GB RAM.
+_lk = open("/tmp/omoro-heavy.lock", "w")
+_t = time.time()
+fcntl.flock(_lk, fcntl.LOCK_EX)
+if time.time() - _t > 1: print(f"[lock] waited {time.time()-_t:.0f}s for /tmp/omoro-heavy.lock")
 
 ap = argparse.ArgumentParser()
 ap.add_argument("urls", nargs="+")
@@ -21,6 +27,7 @@ ap.add_argument("--wait", type=int, default=4000); ap.add_argument("--scroll", t
 ap.add_argument("--full", action="store_true"); ap.add_argument("--mobile", action="store_true")
 ap.add_argument("--reduced", action="store_true"); ap.add_argument("--fps", action="store_true")
 ap.add_argument("--out", default=".shots"); ap.add_argument("--eval", default=None)
+ap.add_argument("--timeout", type=int, default=90000, help="page.goto timeout ms")
 a = ap.parse_args()
 os.makedirs(a.out, exist_ok=True)
 
@@ -38,7 +45,7 @@ async def main():
             pg.on("console", lambda m: print(f"[console.{m.type}]", m.text[:300]) if m.type in ("error", "warning") else None)
             t0 = time.time()
             try:
-                await pg.goto(url, wait_until="load", timeout=60000)
+                await pg.goto(url, wait_until="load", timeout=a.timeout)
             except Exception as e:
                 print("[goto error]", e); continue
             if a.scroll: await pg.evaluate(f"window.scrollTo(0,{a.scroll})")

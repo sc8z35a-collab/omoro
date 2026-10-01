@@ -15,7 +15,7 @@
 | A-5 | 共通 UI バグ修正 BUG #1〜#18, #64, #65（chrome.js / base.css / partials） | A | - | open |
 | A-6 | credits 更新・README・統合・publish・最終 PR | A | - | open |
 | A-7 | 全エージェントの環境エラー集 `docs/DEV_ENV_ERRORS.md` ＋ 次のエージェントへの技術アドバイス `docs/NEXT_AGENT_GUIDE.md` | A | - | open |
-| B-1 | ヒーロー：GPGPU パーティクル（GPUComputationRenderer, 100k〜260k 粒）＋カールノイズ流体、文字モーフ | B | - | open |
+| B-1 | ヒーロー：GPGPU パーティクル（GPUComputationRenderer, 100k〜260k 粒）＋カールノイズ流体、文字モーフ | B | B | claimed 2026-10-01 10:35:23Z |
 | B-2 | ヒーロー：ボリュメトリック・スポットライト（レイマーチ or 多層コーン）＋ゴッドレイ、HDRI 反射床（MeshReflector/SSR風）、DOF、色収差 | B | - | open |
 | B-3 | ホーム各セクションの細部：ホロカードを WebGL 化 or CSS ホロ強化、ステージプレイヤーの GL トランジション、チェーンマップ・温度チャートの発光とマイクロアニメ | B | - | open |
 | B-4 | ホームの既知バグ BUG #19〜#41 | B | - | open |

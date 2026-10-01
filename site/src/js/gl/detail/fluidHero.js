@@ -113,7 +113,7 @@ const MOTES_VERT = /* glsl */`
   void main(){
     vec4 p = texture2D(uPos, ref);
     vSeed = p.w;
-    vBig = step(.965, p.w);                                         // ~3.5% are large out-of-focus bokeh discs
+    vBig = step(.993, p.w);                                         // ~0.7% are large out-of-focus bokeh discs
     vA = smoothstep(0., .18, p.z) * smoothstep(1., .82, p.z);
     vec2 par = (uMouse - .5) * (.004 + p.w * .02);                  // depth parallax by seed
     gl_Position = vec4((p.xy + par) * 2. - 1., 0., 1.);
@@ -128,7 +128,7 @@ const MOTES_FRAG = /* glsl */`
     if (d > .5) discard;
     float core = smoothstep(.5, .0, d);
     float disc = smoothstep(.5, .44, d) * (.35 + .65 * smoothstep(.2, .48, d));   // bokeh: brighter rim
-    float a = mix(core * core, disc * .22, vBig) * vA;
+    float a = mix(core * core, disc * .09, vBig) * vA;
     vec3 col = mix(uWarm, uAccent, smoothstep(.3, .9, vSeed));
     gl_FragColor = vec4(col * mix(2.4, 1.1, vBig) * a, a);
   }`;

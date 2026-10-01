@@ -71,7 +71,6 @@ moments.forEach((m, i) => {
         <img class="d-hero-img" src="{{base}}img/${m.image}.webp" alt="" fetchpriority="high" />
         <div class="d-hero-shade" aria-hidden="true"></div>
         <div class="d-hero-hint mono" aria-hidden="true"><i></i>DRAG TO STIR THE INK</div>
-        <div class="d-scrollcue mono" aria-hidden="true"><span>SCROLL</span><i></i></div>
         <div class="d-hero-ui">
           <nav class="d-crumb mono" aria-label="パンくず"><a href="{{base}}">OMORO</a><span>/</span><a href="{{base}}#archive">MOMENTS</a><span>/</span><strong>${m.number}</strong></nav>
           <div class="d-ghost latin" aria-hidden="true">${m.number}</div>

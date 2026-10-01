@@ -41,7 +41,7 @@ const intro = () => {
     .from(".d-aside", { opacity: 0, y: 40, rotateX: 18, transformOrigin: "50% 100%", duration: 1.4, ease: "expo.out" }, .6)
     .from(".d-crumb > *", { opacity: 0, x: -10, duration: .8, stagger: .05, ease: "expo.out" }, .3)
     .from(".d-ghost", { opacity: 0, xPercent: 18, duration: 2.2, ease: "expo.out" }, 0)
-    .from([".d-hero-hint", ".d-scrollcue"], { opacity: 0, duration: 1.2 }, 1.2);
+    .from(".d-hero-hint", { opacity: 0, duration: 1.2 }, 1.2);
   gsap.to(".d-hero-img", { yPercent: 12, scale: 1.14, ease: "none", scrollTrigger: { trigger: ".d-hero", start: "top top", end: "bottom top", scrub: true } });
   gsap.to(".d-ghost", { yPercent: 40, ease: "none", scrollTrigger: { trigger: ".d-hero", start: "top top", end: "bottom top", scrub: true } });
   gsap.to(".d-hero-main", { yPercent: -10, opacity: .2, ease: "none", scrollTrigger: { trigger: ".d-hero", start: "30% top", end: "bottom top", scrub: true } });

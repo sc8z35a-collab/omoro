@@ -72,9 +72,9 @@ export class GalleryScene {
     this.applyLayout("ring", true);
 
     this.fx = makeComposer(r, scene, this.camera, {
-      bloom: { strength: .62, radius: .55, threshold: .86 },
+      bloom: { strength: .42, radius: .5, threshold: .92 },
       dof: { focus: 15, aperture: .00018, maxblur: .0065 },
-      final: { ca: .0016, grain: .05, vignette: .5, halation: .16 }
+      final: { ca: .0009, grain: .045, vignette: .55, halation: .1 }
     });
     this.gate = visibilityGate(this.canvas);
     this.raycaster = new THREE.Raycaster();
@@ -111,6 +111,15 @@ export class GalleryScene {
     const sx = (CARD_W + .06) / .392, sy = (CARD_H + .06) / .5;
     frameGeo = frameGeo.clone();
     frameGeo.translate(0, .004, -.0093);
+    // the carved border is ~70% of the opening width — slim it so the print stays the hero
+    { const P = frameGeo.attributes.position, ox = .198, oy = .252, k = .58;
+      for (let i = 0; i < P.count; i++) {
+        let x = P.getX(i), y = P.getY(i);
+        if (Math.abs(x) > ox) x = Math.sign(x) * (ox + (Math.abs(x) - ox) * k);
+        if (Math.abs(y) > oy) y = Math.sign(y) * (oy + (Math.abs(y) - oy) * k);
+        P.setXY(i, x, y);
+      }
+      frameGeo.computeVertexNormals(); }
     frameGeo.scale(sx, sy, (sx + sy) * .5 * .85);
     frameGeo.computeBoundingBox();
     const goldMat = new THREE.MeshPhysicalMaterial({
@@ -164,7 +173,7 @@ export class GalleryScene {
     const post = new THREE.Mesh(new THREE.CylinderGeometry(.035, .05, 1, 24), this.brassMat());
     post.scale.y = 1; post.castShadow = true;
     holder.add(post);
-    const glow = new THREE.Mesh(new THREE.PlaneGeometry(4.4, 4.4), new THREE.MeshBasicMaterial({ map: blobTexture(), color: hot(m.accent, .55), transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false }));
+    const glow = new THREE.Mesh(new THREE.PlaneGeometry(3.6, 3.6), new THREE.MeshBasicMaterial({ map: blobTexture(), color: hot(m.accent, .55), transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false }));
     glow.rotation.x = -Math.PI / 2;
     this.world.add(glow);
 
@@ -237,7 +246,7 @@ export class GalleryScene {
 
     const rep = 7;
     const mat = this.floorMat = new THREE.MeshPhysicalMaterial({
-      color: 0xffffff, map: this.tx("tex/c-marble-col.webp", { srgb: true, repeat: rep }),
+      color: 0x45454c, map: this.tx("tex/c-marble-col.webp", { srgb: true, repeat: rep }),
       normalMap: this.tx("tex/c-marble-nor.webp", { repeat: rep }), normalScale: new THREE.Vector2(.55, .55),
       roughnessMap: this.tx("tex/c-marble-rough.webp", { repeat: rep }),
       roughness: .5, metalness: 0, clearcoat: 1, clearcoatRoughness: .06, envMapIntensity: .22
@@ -482,8 +491,8 @@ export class GalleryScene {
   }
   setHouse(v) {
     this.house = v;
-    this.hemi.intensity = .32 * v;
-    this.rectL.intensity = 9 * v; this.rectR.intensity = 7 * v;
+    this.hemi.intensity = .16 * v;
+    this.rectL.intensity = 4 * v; this.rectR.intensity = 3 * v;
     this.rim.intensity = 1.2 * v;
     this.lanternLights.forEach((l) => { l.intensity = 22 * v; });
   }
@@ -626,7 +635,7 @@ export class GalleryScene {
       c.beam.material.uniforms.uTime.value = t;
       // floor glow
       c.glow.position.set(c.holder.position.x, FLOOR_Y + .01, c.holder.position.z);
-      c.glow.material.opacity = c.light * (.25 + h * .55) * dim;
+      c.glow.material.opacity = c.light * (.12 + h * .35) * dim;
       // feed dust (world-local positions; dust lives in this.world)
       this.dustU.uLightPos.value[i].copy(lp);
       this.dustU.uLightDir.value[i].copy(dir);
@@ -635,7 +644,7 @@ export class GalleryScene {
     this.dustU.uTime.value = t;
     this.lanterns.material.uniforms.uTime.value = t;
     this.neon.material.uniforms.uTime.value = t;
-    this.lanternLights.forEach((l, k) => { l.intensity = 22 * (this.house || 0) * (.9 + .1 * Math.sin(t * 6 + k * 2)); });
+    this.lanternLights.forEach((l, k) => { l.intensity = 12 * (this.house || 0) * (.9 + .1 * Math.sin(t * 6 + k * 2)); });
 
     // camera — slow drift + parallax, rack to the focused frame
     let target, look;

@@ -132,7 +132,7 @@ export const lanternFrag = /* glsl */`
     vec3 paper = vCol * (.8 + 2.6 * pow(face, 1.6)) * mix(.45, 1., rib) * flick;
     paper = mix(paper, paper * vec3(.25, .2, .18), band * .55);              // painted band (darker ink)
     float cap = step(vUv.y, .07) + step(.93, vUv.y);
-    vec3 col = mix(paper * 2.2, vec3(.02, .015, .012), cap);
+    vec3 col = mix(paper * 1.5, vec3(.02, .015, .012), cap);
     gl_FragColor = vec4(col * mix(.02, 1., on), 1.);
   }`;
 
@@ -160,7 +160,7 @@ export const beamFrag = /* glsl */`
     float fade = pow(along, 1.4) * smoothstep(.0, .25, along) * smoothstep(1., .93, along);
     float smoke = .55 + .45 * snoise(vec3(vW.x * .35, vW.y * .5 - uTime * .12, vW.z * .35 + uTime * .05));
     float a = face * fade * smoke * uOn;
-    gl_FragColor = vec4(uColor * a * .22, 1.);
+    gl_FragColor = vec4(uColor * a * .15, 1.);
   }`;
 
 /* ------------------------------------------------------------------------------------------------

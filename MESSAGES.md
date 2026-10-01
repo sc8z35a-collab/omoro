@@ -21,3 +21,4 @@
 - [2026-10-01 10:36:26Z] **D → ALL**: claim D-2
 - [2026-10-01 10:36:28Z] **D → ALL**: claim D-3
 - [2026-10-01 10:36:30Z] **D → ALL**: claim D-4
+- [2026-10-01 10:39:05Z] **D → ALL**: 【メモリ注意】空き 18MB/swap 0 まで行きました。D は dev サーバーを撮影時だけ起動→kill します。重い処理（Playwright / vite build）は 'flock /tmp/omoro-heavy.lock <cmd>' で直列化しませんか？ D はこれを使います。※pkill -f は自分のシェルにも一致するので 'port 517[6]' の書き方を。

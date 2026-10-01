@@ -23,7 +23,7 @@
 .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
 .hero-switch { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .hero-switch-label { color: var(--muted); margin-right: 6px; }
-.hero-chip { height: 38px; min-width: 38px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line-strong); background: rgba(11, 12, 13, .45); backdrop-filter: blur(10px); font-size: .82rem; font-weight: 700; color: var(--paper-dim); transition: background .35s, color .35s, border-color .35s, transform .4s var(--ease); }
+.hero-chip { display: inline-flex; align-items: center; gap: 8px; height: 38px; min-width: 38px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line-strong); background: rgba(11, 12, 13, .45); backdrop-filter: blur(10px); font-size: .82rem; font-weight: 700; color: var(--paper-dim); transition: background .35s, color .35s, border-color .35s, transform .4s var(--ease); }
 .hero-chip:hover { color: var(--paper); border-color: var(--chip, var(--acid)); transform: translateY(-2px); }
 .hero-chip.is-active { color: var(--ink); background: var(--chip, var(--acid)); border-color: transparent; box-shadow: 0 0 30px -4px var(--chip, var(--acid)); }
 .hero-bottom { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; gap: 20px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); }
@@ -32,6 +32,12 @@
 .hero-scroll i { position: relative; width: 1px; height: 34px; background: var(--line-strong); overflow: hidden; }
 .hero-scroll i::after { content: ""; position: absolute; left: 0; top: -40%; width: 1px; height: 40%; background: var(--acid); animation: drip 1.8s var(--ease-io) infinite; }
 @keyframes drip { to { top: 110%; } }
+.hero-chip .chip-num { font-family: var(--f-mono); font-size: .7rem; opacity: .7; }
+.hero-chip.is-active .chip-num { opacity: 1; }
+.hero-rail-live i { display: inline-block; width: 6px; height: 6px; margin-right: 8px; border-radius: 50%; background: var(--hero-accent, var(--acid)); box-shadow: 0 0 10px var(--hero-accent, var(--acid)); vertical-align: middle; }
+.hero-rail-live b { color: var(--paper); font-weight: 500; }
+.hero.is-nogl .hero-rail-live, .hero:not(.is-gl) .hero-rail-live { display: none; }
+@media (max-width: 760px) { .hero-chip .chip-name { display: none; } .hero-chip[data-morph="intro"] .chip-name { display: inline; } }
 @media (max-width: 860px) {
   .hero-ui { grid-template-columns: 1fr; padding-top: 96px; }
   .hero-side { grid-column: 1; max-width: none; }

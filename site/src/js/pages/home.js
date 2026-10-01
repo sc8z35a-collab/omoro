@@ -1,9 +1,9 @@
 import "../../css/base.css";
 import "../../css/home.css";
 import { initChrome, initReveals, gsap, ScrollTrigger, toast, magnetic, splitChars, lenis } from "../core/chrome.js";
-import { moments, momentUrl, img, search, normalize } from "../core/data.js";
+import { moments, momentUrl, img, url, normalize } from "../core/data.js";
 import { store } from "../core/store.js";
-import { reduced, webglOK, qs, qsa, h, isMobile } from "../core/env.js";
+import { reduced, coarse, webglOK, qs, qsa, h } from "../core/env.js";
 import { tilt } from "../ui/tilt.js";
 
 initChrome();
@@ -13,35 +13,47 @@ let hero = null;
 const heroCanvas = qs(".hero-canvas");
 const heroNow = qs(".hero-now");
 const chips = qs(".hero-switch");
-moments.forEach((m, i) => chips.append(h("button", { type: "button", class: "hero-chip", "data-morph": i, "aria-pressed": "false", "--chip": m.accent }, m.number + " " + m.title)));
-if (isMobile()) qsa(".hero-chip", chips).forEach((c, i) => { if (i) c.textContent = moments[i - 1].number; });
+const noGL = !webglOK() || new URLSearchParams(location.search).has("nogl");
+moments.forEach((m, i) => chips.append(h("button", { type: "button", class: "hero-chip", "data-morph": i, "aria-pressed": "false", "--chip": m.accent, "aria-label": `${m.number} ${m.title}` }, h("span", { class: "chip-num" }, m.number), h("span", { class: "chip-name" }, m.title))));
 
 function setChip(key) {
   qsa(".hero-chip", chips).forEach((c) => { const on = c.dataset.morph === String(key); c.classList.toggle("is-active", on); c.setAttribute("aria-pressed", String(on)); });
   heroNow.textContent = "NOW: " + (key === "intro" ? "面白いねえ。" : moments[key].title);
+  const accent = key === "intro" ? "#d8ff4f" : moments[key].accent;
+  qs(".hero").style.setProperty("--hero-accent", accent);
 }
-let autoTimer = null, autoIndex = -1;
+let autoTimer = null, autoIndex = -1, resumeTimer = null;
 function stopAuto() { clearInterval(autoTimer); autoTimer = null; }
 function startAuto() {
   stopAuto();
   if (reduced) return;
-  autoTimer = setInterval(() => { autoIndex = (autoIndex + 1) % moments.length; hero?.show(autoIndex); setChip(autoIndex); }, 5200);
+  autoTimer = setInterval(() => { autoIndex = (autoIndex + 1) % moments.length; hero?.show(autoIndex); setChip(autoIndex); }, 6400);
 }
 chips.addEventListener("click", (e) => {
   const b = e.target.closest(".hero-chip");
   if (!b || !hero) return;
-  stopAuto();
+  stopAuto(); clearTimeout(resumeTimer);
   const key = b.dataset.morph;
   if (key === "intro") hero.showIntro(); else { autoIndex = Number(key); hero.show(autoIndex); }
   setChip(key);
-  setTimeout(startAuto, 12000);
+  resumeTimer = setTimeout(startAuto, 12000);
 });
 
 async function bootHero() {
-  if (!webglOK() || new URLSearchParams(location.search).has("nogl")) { heroCanvas.remove(); chips.hidden = true; return; }
-  const { HeroScene } = await import("../gl/heroScene.js");
-  hero = new HeroScene(heroCanvas, moments);
-  setTimeout(startAuto, 6000);
+  if (noGL) { heroCanvas.remove(); chips.hidden = true; qs(".hero").classList.add("is-nogl"); return; }
+  try {
+    const { HeroScene } = await import("../gl/heroScene.js");
+    hero = new HeroScene(heroCanvas, moments);
+    await hero.ready;
+    if (new URLSearchParams(location.search).has("debug")) window.__hero = hero;
+    qs(".hero").classList.add("is-gl");
+    const cnt = qs(".hero-rail-count"); if (cnt) cnt.textContent = hero.particleCount.toLocaleString("en-US");
+  } catch (err) {
+    console.error("[hero] WebGL init failed, falling back", err);
+    hero = null; heroCanvas.remove(); chips.hidden = true; qs(".hero").classList.add("is-nogl");
+    return;
+  }
+  setTimeout(startAuto, 7000);
   ScrollTrigger.create({ trigger: ".hero", start: "top top", end: "bottom top", scrub: true, onUpdate: (st) => hero.setScroll(st.progress) });
 }
 bootHero();
@@ -59,7 +71,7 @@ document.documentElement.classList.contains("is-loaded") ? heroIntro() : documen
 /* ================= HORIZONTAL HOLO CARDS ================= */
 const track = qs(".hscroll-track");
 moments.forEach((m, i) => {
-  const card = h("a", { class: "holo", href: momentUrl(m), role: "listitem", "--card-accent": m.accent, "data-cursor": "OPEN", "aria-label": `${m.number} ${m.title} — 特設ページへ` },
+  const card = h("a", { class: "holo", href: momentUrl(m), "--card-accent": m.accent, "data-cursor": "OPEN", "aria-label": `${m.number} ${m.title} — 特設ページへ` },
     h("div", { class: "holo-shadow", "aria-hidden": "true" }),
     h("div", { class: "holo-inner" },
       h("img", { class: "holo-img", src: img(m.image, true), alt: "", loading: "lazy", decoding: "async" }),
@@ -72,10 +84,11 @@ moments.forEach((m, i) => {
       h("p", { class: "holo-quote" + (m.lines.join("").length > 10 ? " is-long" : "") }, ...m.lines.flatMap((l, k) => (k ? [h("br"), l] : [l]))),
       h("span", { class: "holo-speaker" }, m.speaker),
       h("div", { class: "holo-cta" }, h("span", {}, "特設ページ"), h("span", {}, "↗"))));
-  track.append(card);
+  // gsap animates the outer slot (fly-in), the pointer tilt lives on the inner card (BUG #26)
+  track.append(h("div", { class: "holo-slot", role: "listitem" }, card));
   tilt(card, { max: 10 });
 });
-track.append(h("div", { class: "hscroll-end" }, h("strong", {}, "もっと深く、", h("br"), "見てみる？"), h("a", { class: "btn btn-primary", href: "./gallery/" }, "3Dで見る ", h("span", { class: "btn-arrow" }, "↗"))));
+track.append(h("div", { class: "hscroll-end", role: "listitem" }, h("strong", {}, "もっと深く、", h("br"), "見てみる？"), h("a", { class: "btn btn-primary", href: url("gallery/") }, "3Dで見る ", h("span", { class: "btn-arrow" }, "↗"))));
 
 const mm = gsap.matchMedia();
 mm.add("(min-width: 861px)", () => {
@@ -88,11 +101,13 @@ mm.add("(min-width: 861px)", () => {
       onUpdate: (st) => { bar.style.transform = `scaleX(${st.progress})`; cur.textContent = String(Math.min(6, Math.floor(st.progress * 6) + 1)).padStart(2, "0"); } }
   });
   // cards fly-in with depth
-  qsa(".holo", track).forEach((card) => {
+  qsa(".holo-slot", track).forEach((card) => {
     gsap.fromTo(card, { rotateY: -28, z: -200, opacity: .3 }, { rotateY: 0, z: 0, opacity: 1, ease: "power2.out", scrollTrigger: { trigger: card, containerAnimation: tween, start: "left 100%", end: "left 55%", scrub: true } });
   });
   return () => {};
 });
+
+if (coarse) { const lead = qs(".hscroll-head .section-lead"); if (lead) lead.textContent = "横にスワイプして、6つのセリフを。カードをタップすると特設ページへ。"; }
 
 /* ================= STAGE PLAYER ================= */
 const list = qs(".player-list");
@@ -134,12 +149,15 @@ function showMoment(i, { animate = true } = {}) {
   updateSave(); updateReacts();
   // image crossfade with zoom
   back.src = img(m.image);
+  gsap.killTweensOf([front, back, S.person, S.context, ...qsa(".split-char", S.quote)]);
+  gsap.set([S.person, S.context], { clearProps: "opacity,transform" });
   if (animate && !reduced) {
     gsap.fromTo(back, { opacity: 0, scale: 1.2 }, { opacity: 1, scale: 1.08, duration: 1.4, ease: "expo.out" });
     gsap.to(front, { opacity: 0, duration: 1 });
     const chars = splitCharsFresh(S.quote);
     gsap.from(chars, { yPercent: 110, opacity: 0, rotate: 8, duration: .9, stagger: .03, ease: "expo.out" });
-    gsap.from([S.person, S.context, ...S.beats.children], { opacity: 0, y: 20, duration: .8, stagger: .05, ease: "expo.out", delay: .1 });
+    gsap.fromTo([S.person, S.context, ...S.beats.children], { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: .8, stagger: .05, ease: "expo.out", delay: .1 });
+    stageWipe(m.accent);
   } else { back.style.opacity = 1; front.style.opacity = 0; }
   [front, back] = [back, front];
 }
@@ -155,7 +173,15 @@ S.save.addEventListener("click", () => {
 });
 S.copy.addEventListener("click", async () => {
   try { await navigator.clipboard.writeText(new URL(S.detail.getAttribute("href"), location.href).href); toast("リンクをコピーしました"); }
-  catch { toast("コピーできませんでした"); }
+  catch {
+    // fallback: select a temporary input so the user can copy manually / execCommand
+    const link = new URL(S.detail.getAttribute("href"), location.href).href;
+    const ta = h("textarea", { readonly: "", style: { position: "fixed", opacity: "0", top: "0" } }, link);
+    document.body.append(ta); ta.select();
+    let ok = false; try { ok = document.execCommand("copy"); } catch { /* ignore */ }
+    ta.remove();
+    if (ok) toast("リンクをコピーしました"); else { prompt("このリンクをコピーしてください", link); }
+  }
 });
 qsa("[data-react]", stage).forEach((b) => b.addEventListener("click", (e) => {
   const r = store.react(moments[current].slug, b.dataset.react);
@@ -215,10 +241,10 @@ if (!reduced) gsap.from(qsa(".chain-node"), { scale: 0, opacity: 0, duration: .9
 const dots = qs(".temp-dots"), legend = qs(".temp-legend");
 moments.forEach((m, i) => {
   const x = Math.min(m.gap / 3, 1) * 88 + 6, y = m.volume * .86 + 4, size = 34 + m.volume * .5;
-  const dot = h("a", { class: "temp-dot", href: momentUrl(m), "--c": m.accent, "--s": size + "px", "--d": (i * .6) + "s", style: { left: x + "%", bottom: y + "%" }, "aria-label": `${m.title} 声量${m.volume} 間${m.gap}秒` },
+  const dot = h("a", { class: "temp-dot" + (m.volume > 80 ? " is-top" : "") + (x > 70 ? " is-right" : ""), role: "listitem", href: momentUrl(m), "--c": m.accent, "--s": size + "px", "--d": (i * .6) + "s", style: { left: x + "%", bottom: y + "%" }, "aria-label": `${m.title} 声量${m.volume} 間${m.gap}秒` },
     h("span", { class: "bubble", "aria-hidden": "true" }), h("span", { class: "n", "aria-hidden": "true" }, m.number), h("span", { class: "tip", "aria-hidden": "true" }, m.title));
   dots.append(dot);
-  const lg = h("button", { type: "button", "--c": m.accent }, h("i"), h("span", {}, `${m.number} ${m.title}`), h("small", { class: "mono", style: { marginLeft: "auto", color: "var(--muted)" } }, `VOL ${m.volume} / ${m.gap}s`));
+  const lg = h("button", { type: "button", "--c": m.accent }, h("i"), h("span", {}, `${m.number} ${m.title}`), h("small", { class: "mono", style: { marginLeft: "auto", color: "var(--muted)" } }, `VOL ${String(m.volume).padStart(2, "0")} / ${m.gap.toFixed(1)}s`));
   lg.addEventListener("pointerenter", () => dot.classList.add("is-hot"));
   lg.addEventListener("pointerleave", () => dot.classList.remove("is-hot"));
   lg.addEventListener("focus", () => dot.classList.add("is-hot"));
@@ -233,13 +259,13 @@ const grid = qs(".archive-grid"), status = qs(".archive-status"), empty = qs(".a
 let activeTag = null;
 moments.forEach((m) => {
   const save = h("button", { type: "button", class: "arc-save", "aria-pressed": "false", "aria-label": `${m.title}を保存`, "data-slug": m.slug }, "☆");
-  const card = h("a", { class: "arc", href: momentUrl(m), "--card-accent": m.accent, "data-slug": m.slug, "data-reveal": "" },
+  const card = h("a", { class: "arc", href: momentUrl(m), "--card-accent": m.accent, "data-slug": m.slug },
     h("img", { src: img(m.image, true), alt: "", loading: "lazy", decoding: "async" }),
     h("div", { class: "arc-top" }, h("b", {}, m.number), h("span", {}, m.short)),
     h("strong", { class: m.lines.join("").length > 10 ? "is-long" : "" }, ...m.lines.flatMap((l, k) => (k ? [h("br"), l] : [l]))),
     h("div", { class: "arc-tags" }, ...m.tags.map((t) => h("span", {}, "#" + t))),
     h("em", {}, "特設ページを見る ↗"));
-  const wrap = h("div", { style: { position: "relative" }, "data-slug": m.slug }, card, save);
+  const wrap = h("div", { class: "arc-wrap", "data-slug": m.slug, "data-reveal": "" }, card, save);
   save.addEventListener("click", (e) => { e.preventDefault(); const r = store.toggleSaved(m.slug); if (r === null) return; renderArchiveSaves(); renderSaved(); updateSave(); toast(r ? "保存しました" : "保存を解除しました"); });
   grid.append(wrap);
 });
@@ -251,8 +277,12 @@ tagBox.addEventListener("click", (e) => {
   qsa("button", tagBox).forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
   filterArchive();
 });
+const kana = (s) => String(s).replace(/[\u30a1-\u30f6]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60));
+const foldQuery = (q) => kana(normalize(q));
+const foldHay = new Map(moments.map((m) => [m.slug, kana(normalize([m.title, m.speaker, m.short, m.lead, m.context, m.point, m.en, ...(m.tags || []), ...m.beats.map((b) => b.title + b.body)].join(" ")))]));
+const searchKana = (q) => { const t = foldQuery(q.trim()).split(/\s+/).filter(Boolean); return t.length ? moments.filter((m) => t.every((x) => foldHay.get(m.slug).includes(x))) : moments.slice(); };
 function filterArchive() {
-  const hits = new Set(search(input.value).filter((m) => !activeTag || m.tags.includes(activeTag)).map((m) => m.slug));
+  const hits = new Set(searchKana(input.value).filter((m) => !activeTag || m.tags.includes(activeTag)).map((m) => m.slug));
   let n = 0;
   qsa(":scope > div", grid).forEach((w) => { const on = hits.has(w.dataset.slug); w.hidden = !on; if (on) n++; });
   status.textContent = `${n} MOMENT${n === 1 ? "" : "S"}` + (activeTag ? ` / #${activeTag}` : "");
@@ -262,7 +292,8 @@ function filterArchive() {
 input.addEventListener("input", filterArchive);
 qs("#random-scene").addEventListener("click", () => {
   const visible = qsa(":scope > div:not([hidden])", grid);
-  const pick = (visible.length ? visible : qsa(":scope > div", grid))[Math.floor(Math.random() * (visible.length || 6))];
+  if (!visible.length) { toast("いまの条件に合うセリフがありません"); return; }
+  const pick = visible[Math.floor(Math.random() * visible.length)];
   const card = qs(".arc", pick);
   gsap.fromTo(card, { scale: .96 }, { scale: 1, duration: .5, ease: "back.out(3)", onComplete: () => location.assign(card.href) });
 });
@@ -284,7 +315,7 @@ renderSaved();
 /* ================= SILENCE ================= */
 (() => {
   const dotsEl = qsa(".silence-dots i"), text = qs(".silence-text"), timer = qs(".silence-timer"), pin = qs(".silence-pin");
-  if (reduced) { gsap.set(dotsEl, { opacity: 1, scale: 1 }); gsap.set(text, { opacity: 1 }); return; }
+  if (reduced) { gsap.set(dotsEl, { opacity: 1, scale: 1 }); gsap.set(text, { opacity: 1 }); timer.textContent = "00:03.0"; return; }
   ScrollTrigger.create({
     trigger: ".silence", start: "top top", end: "bottom bottom", scrub: true,
     onUpdate: (st) => {
@@ -301,8 +332,10 @@ renderSaved();
 
 /* ================= WHY cards tilt ================= */
 qsa("[data-tilt]").forEach((el) => tilt(el, { max: 8 }));
+qsa(".why-card .why-glyph").forEach((g) => g.setAttribute("aria-hidden", "true"));
 
 /* ================= mark seen via store on detail pages; reveals ================= */
+if (reduced) qsa("[data-count]").forEach((el) => { el.textContent = el.dataset.count; el.removeAttribute("data-count"); }); // BUG #24
 initReveals();
 magnetic();
 store.on((t) => { if (t === "saved") { renderSaved(); renderArchiveSaves(); updateSave(); } });

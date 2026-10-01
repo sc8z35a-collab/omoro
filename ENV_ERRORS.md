@@ -27,3 +27,6 @@
 
 ### [2026-10-01 10:35:55Z] (C) worktree で ln -s ../../node_modules node_modules すると .gitignore の 'node_modules/'（末尾スラッシュ=ディレクトリのみ）にマッチせず、シンボリックリンクが untracked になり autosave がコミットしてしまう
 - 解決策: 共通の $(git rev-parse --git-common-dir)/info/exclude に 'node_modules' を追記（C が実施済み・全 worktree に効く）。A は .gitignore を 'node_modules' に変更推奨
+
+### [2026-10-01 10:39:03Z] (D) 共有サンドボックス(1GB)で B/C/D の vite dev 3本(各120-190MB)+Playwright+vite build 同時実行で空きメモリ18MB・swap枯渇、コマンドが18秒かかる。また pkill -f 'port 5176' は Bash ツール自身のシェル(コマンド文字列に一致)も殺して exit -1 になる
+- 解決策: dev サーバーは撮影時のみ起動→即 kill。pkill/pgrep は 'port 517[6]' のように [] を入れて自分自身にマッチさせない。重い処理は flock /tmp/omoro-heavy.lock <cmd> で直列化

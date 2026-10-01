@@ -42,3 +42,6 @@
 
 ### [2026-10-01 10:40:41Z] (A) ultra 品質（GTAO+Bokeh+MSAA4+transmission）の three.js ページを SwiftShader で撮影すると 100 秒以上かかり Bash ツールのタイムアウト（exit -1）
 - 解決策: 撮影時は ?q=low（DPR1・GTAO/DOF/SMAA/MSAA 無効）。fx/index.js の quality で URL から切替。ultra の確認は最後に 1 回だけ、--wait を長く・timeout 300000 で。
+
+### [2026-10-01 10:40:43Z] (A) 1GB RAM を 4 エージェントで共有（同一サンドボックス）→ vite dev ×2 で available 18MB / swap 枯渇、Playwright が goto timeout
+- 解決策: vite dev を常駐させない。tools/serve.sh（build → python http.server, ≈15MB）で配信。重い処理は flock /tmp/omoro-heavy.lock で直列化（shot.py は自動）。`ps aux --sort=-rss | head` で犯人を特定。

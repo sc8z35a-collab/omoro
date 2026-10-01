@@ -19,18 +19,18 @@ function showInfo(i, focused) {
   const changed = shown.i !== i;
   shown = { i, focused };
   const m = moments[i];
-  document.body.classList.toggle("g-has-focus", !!(m && focused));
+  document.body.classList.toggle("is-focused", !!(m && focused));
   if (!m) {
-    info.classList.remove("is-active", "is-peek");
+    info.classList.remove("is-active", "is-hover");
     info.style.removeProperty("--c");
-    I.num.textContent = "— / 06"; I.quote.textContent = "カードを選んでください"; I.speaker.textContent = ""; I.context.textContent = ""; I.actions.hidden = true;
+    I.num.textContent = "— / 06"; I.quote.textContent = "額縁を選んでください"; I.speaker.textContent = ""; I.context.textContent = ""; I.actions.hidden = true;
     I.bar && gsap.to(I.bar, { scaleX: 0, duration: .6, ease: "expo.out" });
     if (changed) gsap.fromTo(I.quote, { y: 10, opacity: 0 }, { y: 0, opacity: 1, duration: .5, ease: "expo.out" });
     return;
   }
   info.style.setProperty("--c", m.accent);
   info.classList.toggle("is-active", focused);
-  info.classList.toggle("is-peek", !focused);
+  info.classList.toggle("is-hover", !focused);
   I.num.textContent = `MOMENT ${m.number} / 06${focused ? "" : " — CLICK TO FOCUS"}`;
   I.quote.textContent = m.title;
   I.speaker.textContent = m.speaker;
@@ -48,14 +48,14 @@ const setDots = (i) => qsa("button", dots).forEach((b, k) => b.setAttribute("ari
 
 function fallback() {
   // BUG #45: the fallback list must scroll and show the footer
-  document.body.classList.add("g-nogl");
+  document.body.classList.add("is-fallback");
   qs(".g-canvas")?.remove();
   const fb = qs(".g-fallback"); fb.hidden = false;
-  fb.append(h("div", { class: "g-fallback-grid" }, ...moments.map((m) => h("a", { href: momentUrl(m), "--c": m.accent, class: "g-fb-card" },
-    h("span", { class: "g-fb-img" }, h("img", { src: img(m.image, true), alt: "", loading: "lazy" })),
-    h("span", { class: "mono g-fb-num" }, `MOMENT ${m.number}`),
+  fb.append(h("div", { class: "g-fallback-grid" }, ...moments.map((m) => h("a", { href: momentUrl(m), "--c": m.accent },
+    h("span", { class: "g-fb-frame" }, h("img", { src: img(m.image, true), alt: "", loading: "lazy", width: 800, height: 560 })),
+    h("span", { class: "mono g-fb-num" }, `MOMENT ${m.number} / 06`),
     h("strong", {}, m.title),
-    h("span", { class: "g-fb-sp" }, m.speaker)))));
+    h("small", {}, m.speaker)))));
   qsa(".g-hud, .g-info, .g-loading").forEach((e) => e.hidden = true);
 }
 
@@ -91,7 +91,7 @@ if (!webglOK() || new URLSearchParams(location.search).has("nogl")) {
       if (e.key === "3") scene.applyLayout("wall");
     });
     await scene.ready;
-    document.body.classList.add("g-ready");
+    document.body.classList.add("is-scene-ready");
     loading && gsap.to(loading, { opacity: 0, duration: .8, delay: .3, onComplete: () => loading.remove() });
   } catch (err) {
     console.error("[gallery] WebGL scene failed, falling back", err);

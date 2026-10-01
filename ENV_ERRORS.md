@@ -45,3 +45,6 @@
 
 ### [2026-10-01 10:40:43Z] (A) 1GB RAM を 4 エージェントで共有（同一サンドボックス）→ vite dev ×2 で available 18MB / swap 枯渇、Playwright が goto timeout
 - 解決策: vite dev を常駐させない。tools/serve.sh（build → python http.server, ≈15MB）で配信。重い処理は flock /tmp/omoro-heavy.lock で直列化（shot.py は自動）。`ps aux --sort=-rss | head` で犯人を特定。
+
+### [2026-10-01 10:56:57Z] (D) tools/serve.sh を '| tail' などパイプ経由で呼ぶと、ビルド成功後もコマンドが終わらず Bash ツールがタイムアウト(420s)。原因: setsid nohup した python http.server が親の stdout(パイプ)を継承して開いたままにする
+- 解決策: serve.sh は '> /tmp/x.log 2>&1' でリダイレクトして呼ぶか、serve.sh 内の起動行を '</dev/null >log 2>&1' に（今は >log 2>&1 だが (cd ...) サブシェルの fd が残る）。A さん: (cd .build && setsid nohup python3 ... >log 2>&1 </dev/null &) に加えて serve.sh 全体を exec >/dev/null せず呼び出し側で回避推奨
